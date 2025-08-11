@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
+var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig");
 
 var jwksUrl = jwtConfig["JwksUrl"];
 var keys = await JwtHelper.FetchSigningKeysFromJwks(jwksUrl);
@@ -65,10 +66,10 @@ builder.Services.AddMassTransit(x =>
             e.UseMessageRetry(r => r.Interval(3, 500));
         });
 
-        cfg.Host("localhost", "/", h =>
+        cfg.Host(rabbitMqConfig["Host"], "/", h =>
         {
-            h.Username("guest");
-            h.Password("guest");
+            h.Username(rabbitMqConfig["Login"]);
+            h.Password(rabbitMqConfig["Password"]);
         });
     });
 });

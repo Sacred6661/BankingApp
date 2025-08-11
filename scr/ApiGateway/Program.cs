@@ -1,16 +1,31 @@
+using AccountService.Helpers;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var jwtConfig = builder.Configuration.GetSection("Jwt");
+
+var jwksUrl = jwtConfig["JwksUrl"];
+var keys = await JwtHelper.FetchSigningKeysFromJwks(jwksUrl);
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "https://localhost:7118";
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false
+            ValidateIssuer = true,
+            ValidIssuer = jwtConfig["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtConfig["Audience"],
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKeys = keys,
+
+            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
         };
+
+        options.TokenValidationParameters.RoleClaimType = "role";
     });
 
 builder.Services.AddReverseProxy()

@@ -17,7 +17,7 @@ namespace AccountService.Helpers
             await dbContext.SaveChangesAsync();
         }
 
-        public static async Task DropIdentityDatabasesAsync(IServiceProvider services)
+        public static async Task DropDatabasesAsync(IServiceProvider services)
         {
             using var scope = services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AccountDbContext>();

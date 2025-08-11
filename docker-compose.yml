@@ -15,7 +15,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
     volumes:
-      -  postgres-accounts_data:/var/lib/postgresql/data
+      - postgres-accounts_data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
 
@@ -25,7 +25,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
     volumes:
-      -  postgres-transactions_data:/var/lib/postgresql/data
+      - postgres-transactions_data:/var/lib/postgresql/data
     ports:
       - "5435:5432"
 
@@ -81,11 +81,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Docker
     ports:
       - "5001:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/.well-known/openid-configuration"]
-      interval: 5s
-      timeout: 20s
-      retries: 10
 
   accountservice:
     build:
@@ -96,8 +91,8 @@ services:
     ports:
       - "5002:8080"
     depends_on:
-      authserver:
-        condition: service_healthy
+      - authserver
+      - postgres-users
 
   transactionservice:
     build:
@@ -108,8 +103,8 @@ services:
     ports:
       - "5003:8080"
     depends_on:
-      authserver:
-        condition: service_healthy
+      - authserver
+      - postgres-transactions
 
   historyservice:
     build:
@@ -120,8 +115,8 @@ services:
     ports:
       - "5004:8080"
     depends_on:
-      authserver:
-        condition: service_healthy
+      - authserver
+      - mongodb-histories
 
   apigateway:
     build:
@@ -132,8 +127,7 @@ services:
     ports:
       - "5000:8080"
     depends_on:
-      authserver:
-        condition: service_healthy
+      - authserver
 
 volumes:
   postgres_users_data:
