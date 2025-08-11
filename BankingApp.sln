@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServer", "scr\AuthServer\AuthServer.csproj", "{4DC2F46C-C953-41B8-ACB0-8BBB65101364}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "scr\ApiGateway\ApiGateway.csproj", "{5F69DBE7-4FC0-4B41-86FF-1EDBBF293223}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountService", "scr\AccountService\AccountService.csproj", "{2FDE68D4-BCCE-4901-B842-509D1F99E1AD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionService", "scr\TransactionService\TransactionService.csproj", "{45339490-B40F-40B4-8F98-C1FFC970369A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{DE9F9D25-DD07-4890-B7D6-9A9EA7D19669}"
+	ProjectSection(SolutionItems) = preProject
+		protos\account-action-done.proto = protos\account-action-done.proto
+		protos\transaction-completed.proto = protos\transaction-completed.proto
+		protos\transaction-created.proto = protos\transaction-created.proto
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "scr\Shared\Shared.csproj", "{4D3B64E8-6A46-4FD0-A78D-E0E29B630918}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistoryService", "scr\HistoryService\HistoryService.csproj", "{AED37CC4-402A-4724-BB58-BAD7DCC7ACF8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServer.Tests", "scr\AuthServer.Tests\AuthServer.Tests.csproj", "{3167355D-30DF-47AE-8E91-35A1DA2F6CAF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountService.Tests", "scr\AccountService.Tests\AccountService.Tests.csproj", "{289F015F-4A91-486A-911C-ACFF9EB9E2D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionService.Tests", "scr\TransactionService.Tests\TransactionService.Tests.csproj", "{DDBFA8FA-4E39-4614-AD51-76039033E6F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DC2F46C-C953-41B8-ACB0-8BBB65101364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DC2F46C-C953-41B8-ACB0-8BBB65101364}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DC2F46C-C953-41B8-ACB0-8BBB65101364}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DC2F46C-C953-41B8-ACB0-8BBB65101364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F69DBE7-4FC0-4B41-86FF-1EDBBF293223}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F69DBE7-4FC0-4B41-86FF-1EDBBF293223}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F69DBE7-4FC0-4B41-86FF-1EDBBF293223}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F69DBE7-4FC0-4B41-86FF-1EDBBF293223}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FDE68D4-BCCE-4901-B842-509D1F99E1AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FDE68D4-BCCE-4901-B842-509D1F99E1AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FDE68D4-BCCE-4901-B842-509D1F99E1AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FDE68D4-BCCE-4901-B842-509D1F99E1AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45339490-B40F-40B4-8F98-C1FFC970369A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45339490-B40F-40B4-8F98-C1FFC970369A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45339490-B40F-40B4-8F98-C1FFC970369A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45339490-B40F-40B4-8F98-C1FFC970369A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D3B64E8-6A46-4FD0-A78D-E0E29B630918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D3B64E8-6A46-4FD0-A78D-E0E29B630918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D3B64E8-6A46-4FD0-A78D-E0E29B630918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D3B64E8-6A46-4FD0-A78D-E0E29B630918}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AED37CC4-402A-4724-BB58-BAD7DCC7ACF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AED37CC4-402A-4724-BB58-BAD7DCC7ACF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AED37CC4-402A-4724-BB58-BAD7DCC7ACF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AED37CC4-402A-4724-BB58-BAD7DCC7ACF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3167355D-30DF-47AE-8E91-35A1DA2F6CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3167355D-30DF-47AE-8E91-35A1DA2F6CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3167355D-30DF-47AE-8E91-35A1DA2F6CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3167355D-30DF-47AE-8E91-35A1DA2F6CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{289F015F-4A91-486A-911C-ACFF9EB9E2D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{289F015F-4A91-486A-911C-ACFF9EB9E2D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{289F015F-4A91-486A-911C-ACFF9EB9E2D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{289F015F-4A91-486A-911C-ACFF9EB9E2D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDBFA8FA-4E39-4614-AD51-76039033E6F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDBFA8FA-4E39-4614-AD51-76039033E6F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDBFA8FA-4E39-4614-AD51-76039033E6F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDBFA8FA-4E39-4614-AD51-76039033E6F8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B83C508C-2E39-4197-BF67-3B78D27851DE}
+	EndGlobalSection
+EndGlobal
