@@ -98,3 +98,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+namespace HistoryService
+{
+    public partial class Program { }
+}

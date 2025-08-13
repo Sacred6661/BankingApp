@@ -29,7 +29,7 @@ namespace HistoryService.Consumers
             if (msg.TransactionType == (int)TransactionTypeEnum.Deposit)
                 historyEvent.EventType = (int)HistoryEventTypeEnum.MoneyDeposited;
             if (msg.TransactionType == (int)TransactionTypeEnum.Withdraw)
-                historyEvent.EventType = (int)HistoryEventTypeEnum.MoneyWithdrawn;
+                historyEvent.EventType = (int)HistoryEventTypeEnum.MoneyWithdraw;
 
             if(msg.IsError)
                 historyEvent.EventType = (int)HistoryEventTypeEnum.Error;

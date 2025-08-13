@@ -3,7 +3,7 @@
     public enum HistoryEventTypeEnum
     {
         TransactionCreated = 1,
-        MoneyWithdrawn = 2,
+        MoneyWithdraw = 2,
         MoneyDeposited = 3,
         TransactionCompleted = 4,
         Error = 5

@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace AccountService.IntegrationTests
+namespace HistoryService.IntegrationTests
 {
     public static class FakeTokenHelper
     {

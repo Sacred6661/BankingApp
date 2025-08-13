@@ -30,6 +30,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionService.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountService.IntegrationTests", "scr\AccountService.IntegrationTests\AccountService.IntegrationTests.csproj", "{36DC38AF-C2BF-4D98-8547-140D9CE2529D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HistoryService.IntegrationTests", "scr\HistoryService.IntegrationTests\HistoryService.IntegrationTests.csproj", "{83F4DBE2-3205-4874-8647-EAEFD333F025}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{36DC38AF-C2BF-4D98-8547-140D9CE2529D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36DC38AF-C2BF-4D98-8547-140D9CE2529D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36DC38AF-C2BF-4D98-8547-140D9CE2529D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
