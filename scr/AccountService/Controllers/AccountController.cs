@@ -50,7 +50,7 @@ namespace AccountService.Controllers
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.Parse(userId),
-                Balance = request.InitialBalance
+                Balance = initialBalance
             };
 
             _dbContext.Accounts.Add(account);
@@ -75,7 +75,7 @@ namespace AccountService.Controllers
                 return Problem(
                     detail: $"Id {accountId} is not valid",
                     statusCode: StatusCodes.Status400BadRequest,
-                    title: "Bad Reques",
+                    title: "Bad Request",
                     type: "https://httpstatuses.com/400"
                 );
             }
@@ -108,9 +108,9 @@ namespace AccountService.Controllers
                 if(account.UserId != Guid.Parse(userId))
                      return Problem(
                         detail: "You have no access to other people's accounts",
-                        statusCode: 401,
-                        title: "Unauthorized",
-                        type: "https://httpstatuses.com/401"
+                        statusCode: 403,
+                        title: "Forbidden",
+                        type: "https://httpstatuses.com/403"
                     );
             }
 
