@@ -40,14 +40,15 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.AddDbContext<TransactionsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-var configExpr = new MapperConfigurationExpression();
-configExpr.AddProfile<MappingProfile>();
-
 var loggerFactory = LoggerFactory.Create(builder => {
     builder.AddConsole();
 });
 
-var mapperConfig = new MapperConfiguration(configExpr, loggerFactory);
+var mapperConfig = new MapperConfiguration(cfg =>
+{
+    cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
+}, loggerFactory);
+
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
@@ -109,3 +110,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+namespace TransactionService
+{
+    public partial class Program { }
+}

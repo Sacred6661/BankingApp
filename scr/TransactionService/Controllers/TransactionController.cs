@@ -7,12 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Messaging;
 using MassTransit;
+using AutoMapper;
 
 namespace TransactionService.Controllers
 {
     [ApiController]
     [Route("api/v1")]
-    public class TransactionController(TransactionsDbContext dbContext, IPublishEndpoint publish) : ControllerBase
+    public class TransactionController(TransactionsDbContext dbContext, IPublishEndpoint publish, IMapper _mapper) : ControllerBase
     {
         private readonly TransactionsDbContext _dbContext = dbContext;
         private readonly IPublishEndpoint _publish = publish;
@@ -61,7 +62,9 @@ namespace TransactionService.Controllers
 
             await _publish.Publish(transactionCreated);
 
-            return Ok(transaction);
+            var result = _mapper.Map<TransactionDto>(transaction);
+
+            return Ok(result);
         }
 
         [Authorize(Policy = "RequireUserId")]
@@ -103,7 +106,10 @@ namespace TransactionService.Controllers
 
             await _publish.Publish(transactionCreated);
 
-            return Ok(transaction);
+            var result = new TransactionDto();
+            _mapper.Map(transaction, result);
+
+            return Ok(result);
         }
 
         [Authorize(Policy = "RequireUserId")]
@@ -150,7 +156,9 @@ namespace TransactionService.Controllers
 
             await _publish.Publish(transactionCreated);
 
-            return Ok(transaction);
+            var result = _mapper.Map<TransactionDto>(transaction);
+
+            return Ok(result);
         }
 
         [Authorize(Policy = "RequireUserId")]
@@ -164,7 +172,9 @@ namespace TransactionService.Controllers
                 .Include(t => t.TransactionType)
                 .FirstOrDefaultAsync(t => t.TransactionId == id);
 
-            return transaction is null ? NotFound() : Ok(transaction);
+            var result = _mapper.Map<TransactionDto>(transaction);
+
+            return result is null ? NotFound() : Ok(result);
         }
 
         [Authorize(Policy = "RequireUserId")]
@@ -179,9 +189,11 @@ namespace TransactionService.Controllers
                 .OrderByDescending(t => t.Timestamp)
                 .ToListAsync();
 
+            var result = _mapper.Map<List<TransactionDto>>(transactions);
+
             //TODO: if user is not admin show only transactions with his accounts
 
-            return Ok(transactions);
+            return Ok(result);
         }
     }
 }

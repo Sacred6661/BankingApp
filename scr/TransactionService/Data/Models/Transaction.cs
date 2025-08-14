@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Transactions;
 
 namespace TransactionService.Data.Models
 {
@@ -39,7 +38,7 @@ namespace TransactionService.Data.Models
         public int TransactionStatusId { get; set; }
 
         [ForeignKey(nameof(TransactionStatusId))]
-        public TransactionType TransactionStatus { get; set; }
+        public TransactionStatusEnum TransactionStatus { get; set; }
 
         [NotMapped]
         public TransactionStatusEnum TransactionStatusEnum
