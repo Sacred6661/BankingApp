@@ -66,3 +66,9 @@ app.UseAuthorization();
 app.MapReverseProxy();
 
 app.Run();
+
+
+namespace ApiGateway
+{
+    public partial class Program { }
+}

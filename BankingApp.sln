@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountService.IntegrationT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HistoryService.IntegrationTests", "scr\HistoryService.IntegrationTests\HistoryService.IntegrationTests.csproj", "{83F4DBE2-3205-4874-8647-EAEFD333F025}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway.Tests", "scr\ApiGateway.Tests\ApiGateway.Tests.csproj", "{06303E1B-C368-429B-81DA-4C40C3204F5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,10 @@ Global
 		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83F4DBE2-3205-4874-8647-EAEFD333F025}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06303E1B-C368-429B-81DA-4C40C3204F5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06303E1B-C368-429B-81DA-4C40C3204F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06303E1B-C368-429B-81DA-4C40C3204F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06303E1B-C368-429B-81DA-4C40C3204F5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
