@@ -34,6 +34,7 @@ COPY --from=publish /app/publish .
 USER root
 ADD https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-linux-amd64-v0.7.0.tar.gz /tmp/dockerize.tar.gz
 RUN tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz && rm /tmp/dockerize.tar.gz
+RUN mkdir -p /app/logs && chmod -R 777 /app/logs
 USER app
 
 ENTRYPOINT ["dockerize", "-wait", "tcp://mongodb-histories:27017", "-wait", "tcp://authserver:8080", "-timeout", "60s", "dotnet", "HistoryService.dll"]

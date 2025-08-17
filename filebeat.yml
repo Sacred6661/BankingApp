@@ -1,9 +1,32 @@
 filebeat.inputs:
+  # AccountService (local + docker)
+  - type: log
+    paths:
+      - /logs/accountservice-local/*/*.json
+    fields:
+      service: accountservice
+      source_type: local
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
   - type: log
     paths:
       - /logs/accountservice/*/*.json
     fields:
       service: accountservice
+      source_type: docker
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  # TransactionService
+  - type: log
+    paths:
+      - /logs/transactionservice-local/*/*.json
+    fields:
+      service: transactionservice
+      source_type: local
     fields_under_root: true
     json.keys_under_root: true
     json.add_error_key: true
@@ -13,6 +36,18 @@ filebeat.inputs:
       - /logs/transactionservice/*/*.json
     fields:
       service: transactionservice
+      source_type: docker
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  # HistoryService
+  - type: log
+    paths:
+      - /logs/historyservice-local/*/*.json
+    fields:
+      service: historyservice
+      source_type: local
     fields_under_root: true
     json.keys_under_root: true
     json.add_error_key: true
@@ -22,6 +57,18 @@ filebeat.inputs:
       - /logs/historyservice/*/*.json
     fields:
       service: historyservice
+      source_type: docker
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  # AuthServer
+  - type: log
+    paths:
+      - /logs/authserver-local/*/*.json
+    fields:
+      service: authserver
+      source_type: local
     fields_under_root: true
     json.keys_under_root: true
     json.add_error_key: true
@@ -31,6 +78,18 @@ filebeat.inputs:
       - /logs/authserver/*/*.json
     fields:
       service: authserver
+      source_type: docker
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  # ApiGateway
+  - type: log
+    paths:
+      - /logs/apigateway-local/*/*.json
+    fields:
+      service: apigateway
+      source_type: local
     fields_under_root: true
     json.keys_under_root: true
     json.add_error_key: true
@@ -40,15 +99,17 @@ filebeat.inputs:
       - /logs/apigateway/*/*.json
     fields:
       service: apigateway
+      source_type: docker
     fields_under_root: true
     json.keys_under_root: true
     json.add_error_key: true
 
-# Відправка в Elasticsearch
+
+# Send to Elasticsearch
 output.elasticsearch:
   hosts: ["http://elasticsearch:9200"]
-  index: "logs-%{[service]}-%{+yyyy.MM.dd}"  # Динамічний індекс по сервісу та даті
+  index: "logs-%{[service]}-%{[source_type]}-%{+yyyy.MM.dd}"
 
-# Налаштування шаблону індексу
+# Config index template
 setup.template.name: "logs"
 setup.template.pattern: "logs-*"

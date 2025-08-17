@@ -195,5 +195,12 @@ namespace TransactionService.Controllers
 
             return Ok(result);
         }
+
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            throw new Exception("This is test exception");
+        }
     }
 }

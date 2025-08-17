@@ -101,6 +101,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Docker
     ports:
       - "5001:8080"
+    volumes:
+      - authserver_logs:/app/logs
 
   accountservice:
     build:
@@ -113,6 +115,8 @@ services:
     depends_on:
       - authserver
       - postgres-users
+    volumes:
+      - accountservice_logs:/app/logs
 
   transactionservice:
     build:
@@ -125,6 +129,8 @@ services:
     depends_on:
       - authserver
       - postgres-transactions
+    volumes:
+      - transactionservice_logs:/app/logs
 
   historyservice:
     build:
@@ -137,6 +143,8 @@ services:
     depends_on:
       - authserver
       - mongodb-histories
+    volumes:
+      - historyservice_logs:/app/logs
 
   apigateway:
     build:
@@ -148,17 +156,29 @@ services:
       - "5000:8080"
     depends_on:
       - authserver
+    volumes:
+      - apigateway_logs:/app/logs
   
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.15.0
     container_name: filebeat
     user: root
     volumes:
-      - ./scr/AccountService/bin/Debug/net8.0/logs:/logs/accountservice:ro
-      - ./scr/TransactionService/bin/Debug/net8.0/logs:/logs/transactionservice:ro
-      - ./scr/HistoryService/bin/Debug/net8.0/logs:/logs/historyservice:ro
-      - ./scr/AuthServer/bin/Debug/net8.0/logs:/logs/authserver:ro
-      - ./scr/ApiGateway/bin/Debug/net8.0/logs:/logs/apigateway:ro
+      # local logs (when localhost is using)
+      - ./scr/AccountService/bin/Debug/net8.0/logs:/logs/accountservice-local:ro
+      - ./scr/TransactionService/bin/Debug/net8.0/logs:/logs/transactionservice-local:ro
+      - ./scr/HistoryService/bin/Debug/net8.0/logs:/logs/historyservice-local:ro
+      - ./scr/AuthServer/bin/Debug/net8.0/logs:/logs/authserver-local:ro
+      - ./scr/ApiGateway/bin/Debug/net8.0/logs:/logs/apigateway-local:ro
+
+      # containers logs (when using docker)
+      - accountservice_logs:/logs/accountservice:ro
+      - transactionservice_logs:/logs/transactionservice:ro
+      - historyservice_logs:/logs/historyservice:ro
+      - authserver_logs:/logs/authserver:ro
+      - apigateway_logs:/logs/apigateway:ro
+
+      # config
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
     depends_on:
       - elasticsearch
@@ -170,3 +190,8 @@ volumes:
   postgres-transactions_data:
   mongodb_histories_data:
   es_data:
+  accountservice_logs:
+  transactionservice_logs:
+  historyservice_logs:
+  authserver_logs:
+  apigateway_logs:
