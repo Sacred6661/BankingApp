@@ -1,4 +1,5 @@
 using AutoMapper;
+using Common.Logging;
 using MassTransit;
 using Messaging;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,8 @@ using TransactionService.Helpers;
 using TransactionService.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LoggingSetup.ConfigureLogging(builder);
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig");
@@ -92,10 +95,15 @@ builder.Services.AddMassTransit(x =>
         });
 
         cfg.Publish<TransactionCreated>(x => x.ExchangeType = "fanout");
+
+        var observer = ctx.GetRequiredService<CorrelationConsumeObserver>();
+        cfg.ConnectConsumeObserver(observer);
     });
 });
 
 var app = builder.Build();
+
+LoggingSetup.UseCorrelationLogging(app);
 
 await InitializeDatabase.DropDatabasesAsync(app.Services);
 await InitializeDatabase.InitDbAsync(app.Services);

@@ -16,8 +16,11 @@ using AccountService.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using MassTransit;
 using AccountService.Consumers;
+using Common.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LoggingSetup.ConfigureLogging(builder);
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig");
@@ -88,10 +91,15 @@ builder.Services.AddMassTransit(x =>
             h.Username(rabbitMqConfig["Login"]);
             h.Password(rabbitMqConfig["Password"]);
         });
+
+        var observer = ctx.GetRequiredService<CorrelationConsumeObserver>();
+        cfg.ConnectConsumeObserver(observer);
     });
 });
 
 var app = builder.Build();
+
+LoggingSetup.UseCorrelationLogging(app);
 
 await InitializeDatabase.DropDatabasesAsync(app.Services);
 await InitializeDatabase.InitDbAsync(app.Services);

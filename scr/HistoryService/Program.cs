@@ -1,3 +1,4 @@
+using Common.Logging;
 using HistoryService.Consumers;
 using HistoryService.Data;
 using HistoryService.Helpers;
@@ -5,6 +6,8 @@ using MassTransit;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LoggingSetup.ConfigureLogging(builder);
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig");
@@ -71,6 +74,9 @@ builder.Services.AddMassTransit(x =>
             h.Username(rabbitMqConfig["Login"]);
             h.Password(rabbitMqConfig["Password"]);
         });
+
+        var observer = ctx.GetRequiredService<CorrelationConsumeObserver>();
+        cfg.ConnectConsumeObserver(observer);
     });
 });
 
@@ -83,6 +89,8 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+LoggingSetup.UseCorrelationLogging(app);
 
 using (var scope = app.Services.CreateScope())
 {

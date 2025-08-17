@@ -1,0 +1,54 @@
+filebeat.inputs:
+  - type: log
+    paths:
+      - /logs/accountservice/*/*.json
+    fields:
+      service: accountservice
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  - type: log
+    paths:
+      - /logs/transactionservice/*/*.json
+    fields:
+      service: transactionservice
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  - type: log
+    paths:
+      - /logs/historyservice/*/*.json
+    fields:
+      service: historyservice
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  - type: log
+    paths:
+      - /logs/authserver/*/*.json
+    fields:
+      service: authserver
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+  - type: log
+    paths:
+      - /logs/apigateway/*/*.json
+    fields:
+      service: apigateway
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+
+# Відправка в Elasticsearch
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "logs-%{[service]}-%{+yyyy.MM.dd}"  # Динамічний індекс по сервісу та даті
+
+# Налаштування шаблону індексу
+setup.template.name: "logs"
+setup.template.pattern: "logs-*"

@@ -8,8 +8,11 @@ using AuthServer.Data;
 using Microsoft.AspNetCore.Identity;
 using Duende.IdentityServer.Services;
 using AuthServer.Services;
+using Common.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LoggingSetup.ConfigureLogging(builder);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -60,6 +63,8 @@ builder.Services.AddTransient<IProfileService, CustomProfileService>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+LoggingSetup.UseCorrelationLogging(app);
 
 app.UseIdentityServer();
 

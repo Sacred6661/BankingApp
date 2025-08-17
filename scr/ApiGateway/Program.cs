@@ -1,8 +1,11 @@
 using AccountService.Helpers;
+using Common.Logging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LoggingSetup.ConfigureLogging(builder);
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 
@@ -40,6 +43,8 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+LoggingSetup.UseCorrelationLogging(app);
 
 app.Use(async (context, next) =>
 {
