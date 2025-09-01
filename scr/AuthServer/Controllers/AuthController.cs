@@ -124,32 +124,6 @@ namespace AuthServer.Controllers
             if (!response.IsSuccessStatusCode)
                 return StatusCode((int)response.StatusCode, responseString);
 
-            // set cookies HttpOnly for auth token
-            var tokenData = JsonConvert.DeserializeObject<LoginResponse>(responseString);
-
-            if (tokenData != null)
-            {
-                var isDev = env.IsDevelopment();
-
-                Response.Cookies.Append("access_token", tokenData.AccessToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = isDev ? SameSiteMode.None : SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(15),
-                    Path = "/"
-                });
-
-                Response.Cookies.Append("refresh_token", tokenData.RefreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = isDev ? SameSiteMode.None : SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7),
-                    Path = "/"
-                });
-            }
-
             return Content(responseString, "application/json");
         }
 
