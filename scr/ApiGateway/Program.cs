@@ -12,6 +12,19 @@ var jwtConfig = builder.Configuration.GetSection("Jwt");
 var jwksUrl = jwtConfig["JwksUrl"];
 var keys = await JwtHelper.FetchSigningKeysFromJwks(jwksUrl);
 
+var frontendUrl = builder.Configuration["FrontendUrl"];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(frontendUrl)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -48,10 +61,13 @@ LoggingSetup.UseCorrelationLogging(app);
 
 app.Use(async (context, next) =>
 {
-    if (context.Request.Headers.ContainsKey("Authorization"))
+    if (!context.Request.Headers.ContainsKey("Authorization"))
     {
-        var authorizationHeader = context.Request.Headers["Authorization"].ToString();
-        context.Request.Headers["Authorization"] = authorizationHeader;
+        var accessToken = context.Request.Cookies["access_token"];
+        if (!string.IsNullOrEmpty(accessToken))
+        {
+            context.Request.Headers.Add("Authorization", $"Bearer {accessToken}");
+        }
     }
 
     await next();
@@ -64,6 +80,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

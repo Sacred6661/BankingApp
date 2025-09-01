@@ -6,14 +6,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Text.Json;
 
 namespace AuthServer.Controllers
 {
     [Route("api/v1/auth")]
     [ApiController]
-    public class AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration, UserManager<ApplicationUser> userManager) : ControllerBase
+    public class AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration, UserManager<ApplicationUser> userManager, IWebHostEnvironment env) : ControllerBase
     {
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IConfiguration _configuration = configuration;
@@ -66,6 +68,32 @@ namespace AuthServer.Controllers
                 return StatusCode((int)response.StatusCode, responseString);
             }
 
+            // set cookies HttpOnly for auth token
+            var tokenData = JsonConvert.DeserializeObject<LoginResponse>(responseString);
+
+            if (tokenData != null)
+            {
+                var isDev = env.IsDevelopment();
+
+                Response.Cookies.Append("access_token", tokenData.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = isDev ? SameSiteMode.None : SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+                    Path = "/"
+                });
+
+                Response.Cookies.Append("refresh_token", tokenData.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = isDev ? SameSiteMode.None : SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7),
+                    Path = "/"
+                });
+            }
+
             // Return JSON response message from Duendo
             return Content(responseString, "application/json");
         }
@@ -95,6 +123,32 @@ namespace AuthServer.Controllers
 
             if (!response.IsSuccessStatusCode)
                 return StatusCode((int)response.StatusCode, responseString);
+
+            // set cookies HttpOnly for auth token
+            var tokenData = JsonConvert.DeserializeObject<LoginResponse>(responseString);
+
+            if (tokenData != null)
+            {
+                var isDev = env.IsDevelopment();
+
+                Response.Cookies.Append("access_token", tokenData.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = isDev ? SameSiteMode.None : SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+                    Path = "/"
+                });
+
+                Response.Cookies.Append("refresh_token", tokenData.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = isDev ? SameSiteMode.None : SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7),
+                    Path = "/"
+                });
+            }
 
             return Content(responseString, "application/json");
         }
