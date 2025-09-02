@@ -13,12 +13,14 @@ using Moq;
 using Moq.Protected;
 using Xunit;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
 
 public class AuthControllerTests
 {
     private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
     private readonly Mock<IConfiguration> _configurationMock;
+    private readonly Mock<IWebHostEnvironment> _webHostEnvironmentMock;
 
     public AuthControllerTests()
     {
@@ -30,6 +32,12 @@ public class AuthControllerTests
 
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _configurationMock = new Mock<IConfiguration>();
+
+        _webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        _webHostEnvironmentMock.Setup(env => env.EnvironmentName).Returns("Development");
+        _webHostEnvironmentMock.Setup(env => env.ContentRootPath).Returns(@"C:\MyApp\");
+        _webHostEnvironmentMock.Setup(env => env.WebRootPath).Returns(@"C:\MyApp\wwwroot");
+        _webHostEnvironmentMock.Setup(env => env.ApplicationName).Returns("MyApp");
     }
 
     // 1. Register t
@@ -287,7 +295,8 @@ public class AuthControllerTests
         var controller = new AuthController(
             _httpClientFactoryMock.Object,
             _configurationMock.Object,
-            _userManagerMock.Object);
+            _userManagerMock.Object,
+            _webHostEnvironmentMock.Object);
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
