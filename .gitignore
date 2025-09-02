@@ -362,3 +362,44 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# === React frontend ===
+
+# dependencies
+frontend/node_modules/
+
+# build (production)
+frontend/build/
+frontend/dist/
+
+# cache (for Webpack, Vite, Parcel etc.)
+frontend/.cache/
+frontend/.vite/
+frontend/.parcel-cache/
+frontend/.turbo/
+frontend/.next/
+frontend/out/
+
+frontend/coverage/
+
+# log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# secrets and local configs
+frontend/.env
+frontend/.env.*.local
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# IDE / Editor-specific
+frontend/.vscode/
+frontend/.idea/
+frontend/.eslintcache
+frontend/.DS_Store
+frontend/Thumbs.db
+.vscode/
