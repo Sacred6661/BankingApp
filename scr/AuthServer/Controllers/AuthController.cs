@@ -1,4 +1,5 @@
-﻿using AuthServer.Models;
+﻿using AuthServer.Helpers;
+using AuthServer.Models;
 using Duende.IdentityModel.Client;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
@@ -8,7 +9,9 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 
 namespace AuthServer.Controllers
@@ -127,6 +130,37 @@ namespace AuthServer.Controllers
             return Content(responseString, "application/json");
         }
 
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            try
+            {
+                var accessToken = Request.Cookies["access_token"];
+                if (string.IsNullOrEmpty(accessToken))
+                    return Unauthorized();
 
+                var jwtPayload = JwtHelper.GetPayloadData(accessToken); 
+                if (jwtPayload == null)
+                    return Unauthorized();
+
+                if (jwtPayload.UserId == null) 
+                    return Unauthorized();
+
+                var user = await _userManager.FindByIdAsync(jwtPayload.UserId);
+                if (user == null) 
+                    return Unauthorized();
+
+                return Ok(new
+                {
+                    user.Id,
+                    user.Email,
+                    user.UserName
+                });
+            }
+            catch
+            {
+                return Unauthorized();
+            }
+        }
     }
 }
