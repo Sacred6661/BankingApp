@@ -29,6 +29,16 @@ services:
     ports:
       - "5435:5432"
 
+  postgres-profile:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespw
+    volumes:
+      - postgres-profile_data:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -40,6 +50,7 @@ services:
       - postgres-users
       - postgres-accounts
       - postgres-transactions
+      - postgres-profile
 
   mongodb-histories:
     image: mongo:6.0
@@ -188,6 +199,7 @@ volumes:
   postgres_users_data:
   postgres-accounts_data:
   postgres-transactions_data:
+  postgres-profile_data:
   mongodb_histories_data:
   es_data:
   accountservice_logs:

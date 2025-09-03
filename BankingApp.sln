@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{DE9F9D
 		protos\account-action-done.proto = protos\account-action-done.proto
 		protos\transaction-completed.proto = protos\transaction-completed.proto
 		protos\transaction-created.proto = protos\transaction-created.proto
+		protos\user-created.proto = protos\user-created.proto
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "scr\Shared\Shared.csproj", "{4D3B64E8-6A46-4FD0-A78D-E0E29B630918}"
@@ -34,9 +35,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistoryService.IntegrationT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway.Tests", "scr\ApiGateway.Tests\ApiGateway.Tests.csproj", "{06303E1B-C368-429B-81DA-4C40C3204F5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionService.IntegrationTests", "scr\TransactionService.IntegrationTests\TransactionService.IntegrationTests.csproj", "{AFEA5AB5-1385-4138-B5CB-B506DD0F1315}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionService.IntegrationTests", "scr\TransactionService.IntegrationTests\TransactionService.IntegrationTests.csproj", "{AFEA5AB5-1385-4138-B5CB-B506DD0F1315}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Logging", "scr\Common.Logging\Common.Logging.csproj", "{E03EFB4B-22E0-4BA4-811D-1556692A7F52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Logging", "scr\Common.Logging\Common.Logging.csproj", "{E03EFB4B-22E0-4BA4-811D-1556692A7F52}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProfileService", "scr\ProfileService\ProfileService.csproj", "{0DD5E4D6-F6EA-465C-813C-0F771EF70902}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,6 +103,10 @@ Global
 		{E03EFB4B-22E0-4BA4-811D-1556692A7F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E03EFB4B-22E0-4BA4-811D-1556692A7F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E03EFB4B-22E0-4BA4-811D-1556692A7F52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DD5E4D6-F6EA-465C-813C-0F771EF70902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DD5E4D6-F6EA-465C-813C-0F771EF70902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DD5E4D6-F6EA-465C-813C-0F771EF70902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DD5E4D6-F6EA-465C-813C-0F771EF70902}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
