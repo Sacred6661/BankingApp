@@ -9,10 +9,13 @@ using Microsoft.AspNetCore.Identity;
 using Duende.IdentityServer.Services;
 using AuthServer.Services;
 using Common.Logging;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
 LoggingSetup.ConfigureLogging(builder);
+
+var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig");
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -61,6 +64,23 @@ builder.Services.AddIdentityServer()
 builder.Services.AddTransient<IProfileService, CustomProfileService>();
 
 builder.Services.AddControllers();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auth", false));
+
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host(rabbitMqConfig["Host"], "/", h =>
+        {
+            h.Username(rabbitMqConfig["Login"]);
+            h.Password(rabbitMqConfig["Password"]);
+        });
+
+        var observer = ctx.GetRequiredService<CorrelationConsumeObserver>();
+        cfg.ConnectConsumeObserver(observer);
+    });
+});
 
 var app = builder.Build();
 

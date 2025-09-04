@@ -1,12 +1,21 @@
 ﻿using MassTransit;
 using Messaging;
+using Microsoft.EntityFrameworkCore;
 using ProfileService.Data;
 using ProfileService.Data.Models;
+using System.Diagnostics;
 
 namespace ProfileService.Consumers
 {
-    public class UserCreatedConsumer(ProfileDbContext dbContext) : IConsumer<UserCreated>
+    public class UserCreatedConsumer : IConsumer<UserCreated>
     {
+        private readonly ProfileDbContext _dbContext;
+
+        public UserCreatedConsumer(ProfileDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         public async Task Consume(ConsumeContext<UserCreated> context)
         {
             var msg = context.Message;
@@ -14,32 +23,30 @@ namespace ProfileService.Consumers
             var userId = Guid.Parse(msg.UserId);
             var email = msg.Email;
 
-            var profile = dbContext.Profiles.Where(p => p.UserId == userId)?.FirstOrDefault();
-            if(profile == null)
+            var profile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (profile == null)
             {
                 var addProfile = new Profile
                 {
-                    UserId = userId
+                    UserId = userId,
+                    Contacts = new List<ProfileContact>(),
+                    Settings = new ProfileSettings()
                 };
 
-                var addEmailContact = new ProfileContact
+                addProfile.Contacts.Add(new ProfileContact
                 {
                     UserId = userId,
-                    ContactTypeEnum = ContactTypeEnum.Email,
+                    ContactTypeEnum = ContactTypeEnum.PrimaryEmail,
                     Value = email
-                };
+                });
 
-                var addProfileSettings = new ProfileSettings()
+                addProfile.Settings = new ProfileSettings
                 {
                     UserId = userId
                 };
 
-                // adding profile and related tables data (email from registration and default settings)
-                dbContext.Profiles.Add(addProfile);
-                dbContext.ProfileContacts.Add(addEmailContact);
-                dbContext.ProfileSettings.Add(addProfileSettings);
-
-                await dbContext.SaveChangesAsync();
+                _dbContext.Profiles.Add(addProfile);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

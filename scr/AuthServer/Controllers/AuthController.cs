@@ -3,6 +3,8 @@ using AuthServer.Models;
 using Duende.IdentityModel.Client;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
+using MassTransit;
+using Messaging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -18,7 +20,8 @@ namespace AuthServer.Controllers
 {
     [Route("api/v1/auth")]
     [ApiController]
-    public class AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration, UserManager<ApplicationUser> userManager, IWebHostEnvironment env) : ControllerBase
+    public class AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration, UserManager<ApplicationUser> userManager, 
+        IWebHostEnvironment env, ISendEndpointProvider sendProvider) : ControllerBase
     {
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IConfiguration _configuration = configuration;
@@ -30,11 +33,22 @@ namespace AuthServer.Controllers
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
+            var sendProfileEndpoint = await sendProvider.GetSendEndpoint(new Uri("queue:profile-user-created"));
+
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
             
             // User role by default
             await _userManager.AddToRoleAsync(user, "User");
+
+            var registeredUser = await _userManager.FindByEmailAsync(user.Email);
+            var userCreated = new UserCreated
+            {
+                UserId = registeredUser.Id,
+                Email = registeredUser.Email
+            };
+
+            await sendProfileEndpoint.Send(userCreated);
 
             return Ok(new { message = "User registered successfully" });
         }
@@ -58,7 +72,7 @@ namespace AuthServer.Controllers
                 new("client_secret", clientSecret),
                 new("username", model.Email),
                 new("password", model.Password),
-                new("scope", "openid profile roles api_gateway account_service transaction_service history_service offline_access")
+                new("scope", "openid profile roles api_gateway account_service transaction_service history_service profile_service offline_access")
             };
 
             var content = new FormUrlEncodedContent(pairs);

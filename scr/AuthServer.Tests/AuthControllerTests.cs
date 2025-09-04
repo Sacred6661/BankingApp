@@ -14,6 +14,7 @@ using Moq.Protected;
 using Xunit;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
+using MassTransit;
 
 public class AuthControllerTests
 {
@@ -21,6 +22,8 @@ public class AuthControllerTests
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
     private readonly Mock<IConfiguration> _configurationMock;
     private readonly Mock<IWebHostEnvironment> _webHostEnvironmentMock;
+    private readonly Mock<ISendEndpoint> _sendEndpointMock;
+    private readonly Mock<ISendEndpointProvider> _sendProviderMock;
 
     public AuthControllerTests()
     {
@@ -38,6 +41,16 @@ public class AuthControllerTests
         _webHostEnvironmentMock.Setup(env => env.ContentRootPath).Returns(@"C:\MyApp\");
         _webHostEnvironmentMock.Setup(env => env.WebRootPath).Returns(@"C:\MyApp\wwwroot");
         _webHostEnvironmentMock.Setup(env => env.ApplicationName).Returns("MyApp");
+
+        _sendEndpointMock = new Mock<ISendEndpoint>();
+        _sendEndpointMock
+            .Setup(x => x.Send(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _sendProviderMock = new Mock<ISendEndpointProvider>();
+        _sendProviderMock
+            .Setup(x => x.GetSendEndpoint(It.IsAny<Uri>()))
+            .ReturnsAsync(_sendEndpointMock.Object);
     }
 
     // 1. Register t
@@ -296,7 +309,8 @@ public class AuthControllerTests
             _httpClientFactoryMock.Object,
             _configurationMock.Object,
             _userManagerMock.Object,
-            _webHostEnvironmentMock.Object);
+            _webHostEnvironmentMock.Object,
+            _sendProviderMock.Object);
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";

@@ -2,8 +2,9 @@
 {
     public enum ContactTypeEnum
     {
-        Email = 1,
-        Phone = 2,
-        Telegram = 3
+        PrimaryEmail = 1,
+        Email = 2,
+        Phone = 3,
+        Telegram = 4
     }
 }

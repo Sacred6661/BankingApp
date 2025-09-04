@@ -66,6 +66,12 @@ namespace ProfileService.Helpers
             {
                 new ContactType
                 {
+                    Id = (int)ContactTypeEnum.PrimaryEmail,
+                    TypeName = "Primary Email",
+                    TypeDescription = "Primry Email address that cann't be changed"
+                },
+                new ContactType
+                {
                     Id = (int)ContactTypeEnum.Email,
                     TypeName = "Email",
                     TypeDescription = "Email address"

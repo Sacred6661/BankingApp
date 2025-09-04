@@ -17,7 +17,8 @@ namespace AuthServer.Config
                 new ApiScope("api_gateway", "API Gateway", new[] { "role", "user_id" }),
                 new ApiScope("account_service", "Account Service", new[] { "role", "user_id" }),
                 new ApiScope("transaction_service", "Transaction Service", new[] { "role", "user_id" }),
-                new ApiScope("history_service", "History Service", new[] { "role", "user_id" })
+                new ApiScope("history_service", "History Service", new[] { "role", "user_id" }),
+                new ApiScope("profile_service", "Profile Service", new[] { "role", "user_id" })
             };
 
         public static IEnumerable<ApiResource> ApiResources =>
@@ -42,6 +43,11 @@ namespace AuthServer.Config
                 {
                     Scopes = { "history_service" },
                     UserClaims = { "role", "user_id" }
+                },
+                new ApiResource("profile_service", "Profile Service")
+                {
+                    Scopes = { "profile_service" },
+                    UserClaims = { "role", "user_id" }
                 }
             };
 
@@ -55,7 +61,7 @@ namespace AuthServer.Config
                 ClientSecrets = {
                     new Secret(GetSecret("IdentitySecrets:ClientAppSecret").Sha256())
                 },
-                AllowedScopes = { "api_gateway", "account_service", "transaction_service", "history_service", "openid", "profile", "roles", "user_id" },
+                AllowedScopes = { "api_gateway", "account_service", "transaction_service", "history_service", "profile_service", "openid", "profile", "roles", "user_id" },
 
                 AlwaysIncludeUserClaimsInIdToken = true,
                 AlwaysSendClientClaims = true,

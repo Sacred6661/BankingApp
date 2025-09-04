@@ -7,10 +7,10 @@ namespace ProfileService.Data.Models
         [Key]
         public Guid UserId { get; set; }
 
-        [Required, MaxLength(100)]
+        [MaxLength(100)]
         public string FirstName { get; set; } = null!;
 
-        [Required, MaxLength(100)]
+        [MaxLength(100)]
         public string LastName { get; set; } = null!;
 
         [MaxLength(500)]
@@ -24,6 +24,6 @@ namespace ProfileService.Data.Models
         // Навігація
         public virtual ICollection<ProfileContact> Contacts { get; set; } = new List<ProfileContact>();
         public virtual ICollection<ProfileAddress> Addresses { get; set; } = new List<ProfileAddress>();
-        public virtual ProfileSettings? Settings { get; set; }
+        public virtual ProfileSettings Settings { get; set; }
     }
 }

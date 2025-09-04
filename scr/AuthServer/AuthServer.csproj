@@ -13,6 +13,8 @@
     <PackageReference Include="Duende.IdentityServer" Version="7.2.4" />
     <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="7.2.4" />
     <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="7.2.4" />
+    <PackageReference Include="MassTransit" Version="8.5.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.18" />
@@ -36,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Logging\Common.Logging.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>
