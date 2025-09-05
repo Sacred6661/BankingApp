@@ -50,7 +50,7 @@ namespace AuthServer.Controllers
 
             await sendProfileEndpoint.Send(userCreated);
 
-            return Ok(new { message = "User registered successfully" });
+            return await Login(new Models.LoginRequest { Email = model.Email, Password = model.Password });
         }
 
         [HttpPost("login")]
