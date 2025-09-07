@@ -1,5 +1,6 @@
-using AutoMapper;
 using Common.Logging;
+using Mapster;
+using MapsterMapper;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -42,17 +43,11 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.AddDbContext<ProfileDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-var loggerFactory = LoggerFactory.Create(builder => {
-    builder.AddConsole();
-});
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
-var mapperConfig = new MapperConfiguration(cfg =>
-{
-    cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
-}, loggerFactory);
-
-var mapper = mapperConfig.CreateMapper();
-builder.Services.AddSingleton(mapper);
+// автоматично застосує всі класи IRegister з твого проекту
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 
 builder.Services.AddControllers();
 
@@ -96,6 +91,9 @@ await InitializeDatabase.DropDatabasesAsync(app.Services);
 await InitializeDatabase.InitDbAsync(app.Services);
 await InitializeDatabase.SeedContactTypesAsync(app.Services);
 await InitializeDatabase.SeedAddressTypesAsync(app.Services);
+await InitializeDatabase.SeedLanguagesAsync(app.Services);
+await InitializeDatabase.SeedTimezonesAsync(app.Services);
+await InitializeDatabase.SeedCountriesAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 

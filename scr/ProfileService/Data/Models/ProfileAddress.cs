@@ -34,9 +34,12 @@ public class ProfileAddress
     [Required, MaxLength(20)]
     public string ZipCode { get; set; } = null!;
 
-    [Required, MaxLength(100)]
-    public string Country { get; set; } = null!;
+    [Required]
+    public int CountryId { get; set; }
+
+    public bool IsActive { get; set; } = true;
 
     [ForeignKey(nameof(UserId))]
     public virtual Profile Profile { get; set; } = null!;
+    public virtual Country Country { get; set; } = null;
 }

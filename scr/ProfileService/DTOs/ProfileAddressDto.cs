@@ -12,6 +12,10 @@ namespace ProfileService.DTOs
         public string AddressLine { get; set; }
         public string City { get; set; }
         public string ZipCode { get; set; }
-        public string Country { get; set; }
+
+        public int CountryId { get; set; }
+        public string CountryName { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

@@ -14,5 +14,8 @@ namespace ProfileService.Data
         public DbSet<ProfileSettings> ProfileSettings { get; set; } = null!;
         public DbSet<AddressType> AddressTypes { get; set; } = null!;
         public DbSet<ContactType> ContactTypes { get; set; } = null!;
+        public DbSet<Language> Languages { get; set; } = null;
+        public DbSet<Timezone> Timezones { get; set; } = null;
+        public DbSet<Country> Countries { get; set; } = null;
     }
 }

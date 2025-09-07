@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -11,9 +12,11 @@ using ProfileService.Data;
 namespace ProfileService.Data.Migrations
 {
     [DbContext(typeof(ProfileDbContext))]
-    partial class ProfileDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250905201017_Added_isActive_to_Tables")]
+    partial class Added_isActive_to_Tables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,8 +46,10 @@ namespace ProfileService.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -60,8 +65,6 @@ namespace ProfileService.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressTypeId");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("UserId");
 
@@ -113,57 +116,6 @@ namespace ProfileService.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactTypes");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Alpha2Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Alpha3Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<int>("NumericCode")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Language", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Languages");
                 });
 
             modelBuilder.Entity("ProfileService.Data.Models.Profile", b =>
@@ -234,51 +186,22 @@ namespace ProfileService.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<bool>("NotificationsEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("TimeZoneId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("LanguageId");
-
-                    b.HasIndex("TimeZoneId");
-
                     b.ToTable("ProfileSettings");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Timezone", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int?>("OffsetMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UtcOffset")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Timezones");
                 });
 
             modelBuilder.Entity("ProfileAddress", b =>
@@ -289,12 +212,6 @@ namespace ProfileService.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProfileService.Data.Models.Country", "Country")
-                        .WithMany("Addresses")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ProfileService.Data.Models.Profile", "Profile")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
@@ -302,8 +219,6 @@ namespace ProfileService.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("AddressType");
-
-                    b.Navigation("Country");
 
                     b.Navigation("Profile");
                 });
@@ -329,29 +244,13 @@ namespace ProfileService.Data.Migrations
 
             modelBuilder.Entity("ProfileService.Data.Models.ProfileSettings", b =>
                 {
-                    b.HasOne("ProfileService.Data.Models.Language", "Language")
-                        .WithMany("ProfileSettings")
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProfileService.Data.Models.Timezone", "Timezone")
-                        .WithMany("ProfileSettings")
-                        .HasForeignKey("TimeZoneId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ProfileService.Data.Models.Profile", "Profile")
                         .WithOne("Settings")
                         .HasForeignKey("ProfileService.Data.Models.ProfileSettings", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Language");
-
                     b.Navigation("Profile");
-
-                    b.Navigation("Timezone");
                 });
 
             modelBuilder.Entity("ProfileService.Data.Models.AddressType", b =>
@@ -364,16 +263,6 @@ namespace ProfileService.Data.Migrations
                     b.Navigation("ProfileContacts");
                 });
 
-            modelBuilder.Entity("ProfileService.Data.Models.Country", b =>
-                {
-                    b.Navigation("Addresses");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Language", b =>
-                {
-                    b.Navigation("ProfileSettings");
-                });
-
             modelBuilder.Entity("ProfileService.Data.Models.Profile", b =>
                 {
                     b.Navigation("Addresses");
@@ -381,11 +270,6 @@ namespace ProfileService.Data.Migrations
                     b.Navigation("Contacts");
 
                     b.Navigation("Settings");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Timezone", b =>
-                {
-                    b.Navigation("ProfileSettings");
                 });
 #pragma warning restore 612, 618
         }

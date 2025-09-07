@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -11,9 +12,11 @@ using ProfileService.Data;
 namespace ProfileService.Data.Migrations
 {
     [DbContext(typeof(ProfileDbContext))]
-    partial class ProfileDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250905225244_Added_2_tables")]
+    partial class Added_2_tables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,8 +46,10 @@ namespace ProfileService.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -60,8 +65,6 @@ namespace ProfileService.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressTypeId");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("UserId");
 
@@ -113,31 +116,6 @@ namespace ProfileService.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactTypes");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Alpha2Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Alpha3Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<int>("NumericCode")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("ProfileService.Data.Models.Language", b =>
@@ -262,16 +240,13 @@ namespace ProfileService.Data.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<int?>("OffsetMinutes")
-                        .HasColumnType("integer");
 
                     b.Property<string>("UtcOffset")
                         .HasColumnType("text");
@@ -289,12 +264,6 @@ namespace ProfileService.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProfileService.Data.Models.Country", "Country")
-                        .WithMany("Addresses")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ProfileService.Data.Models.Profile", "Profile")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
@@ -302,8 +271,6 @@ namespace ProfileService.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("AddressType");
-
-                    b.Navigation("Country");
 
                     b.Navigation("Profile");
                 });
@@ -335,7 +302,7 @@ namespace ProfileService.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProfileService.Data.Models.Timezone", "Timezone")
+                    b.HasOne("ProfileService.Data.Models.Timezone", "TimeZone")
                         .WithMany("ProfileSettings")
                         .HasForeignKey("TimeZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -351,7 +318,7 @@ namespace ProfileService.Data.Migrations
 
                     b.Navigation("Profile");
 
-                    b.Navigation("Timezone");
+                    b.Navigation("TimeZone");
                 });
 
             modelBuilder.Entity("ProfileService.Data.Models.AddressType", b =>
@@ -362,11 +329,6 @@ namespace ProfileService.Data.Migrations
             modelBuilder.Entity("ProfileService.Data.Models.ContactType", b =>
                 {
                     b.Navigation("ProfileContacts");
-                });
-
-            modelBuilder.Entity("ProfileService.Data.Models.Country", b =>
-                {
-                    b.Navigation("Addresses");
                 });
 
             modelBuilder.Entity("ProfileService.Data.Models.Language", b =>

@@ -8,14 +8,14 @@ namespace ProfileService.Data.Models
         [Key, ForeignKey(nameof(Profile))] // PK одночасно є FK
         public Guid UserId { get; set; }
 
-        [Required, MaxLength(10)]
-        public string Language { get; set; } = "en";
+        public int LanguageId { get; set; }
 
-        [Required, MaxLength(50)]
-        public string Timezone { get; set; } = "UTC";
+        public int TimeZoneId { get; set; }
 
         public bool NotificationsEnabled { get; set; } = true;
 
         public virtual Profile Profile { get; set; } = null!;
+        public virtual Language Language { get; set; } = null!;
+        public virtual Timezone Timezone { get; set; } = null!;
     }
 }

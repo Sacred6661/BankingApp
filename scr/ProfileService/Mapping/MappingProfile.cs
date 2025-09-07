@@ -1,32 +1,35 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using ProfileService.Data.Models;
 using ProfileService.DTOs;
 
 namespace ProfileService.Mapping
 {
-    public class MappingProfile : AutoMapper.Profile
+    public class MappingProfile : IRegister
     {
-        public MappingProfile()
+        public void Register(TypeAdapterConfig config)
         {
-            CreateMap<Data.Models.Profile, ProfileDto>()
-                .ForMember(dest => dest.FullName,
-                    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
+            // Profile -> ProfileDto
+            config.ForType<Profile, ProfileDto>()
+                .Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}");
 
-            CreateMap<ProfileContact, ProfileContactDto>();
+            // ProfileContact -> ProfileContactDto
+            config.ForType<ProfileContact, ProfileContactDto>()
+                .Map(dest => dest.ContactTypeName, src => src.ContactType.TypeName)
+                .Map(dest => dest.ContactTypeId, src => src.ContactType.Id);
 
-            CreateMap<ProfileAddress, ProfileAddressDto>()
-                .ForMember(dest => dest.AddessTypeName,
-                    opt => opt.MapFrom(src => src.AddressType.TypeName))
-                .ForMember(dest => dest.AddressTypeId,
-                    opt => opt.MapFrom(src => src.AddressType.Id));
+            // ProfileAddress -> ProfileAddressDto
+            config.ForType<ProfileAddress, ProfileAddressDto>()
+                .Map(dest => dest.AddessTypeName, src => src.AddressType.TypeName)
+                .Map(dest => dest.AddressTypeId, src => src.AddressType.Id)
+                .Map(dest => dest.CountryName, src => src.C.TypeName)
+                .Map(dest => dest.AddressTypeId, src => src.AddressType.Id); ;
 
-            CreateMap<ProfileContact, ProfileContactDto>()
-            .ForMember(dest => dest.ContactTypeName,
-                opt => opt.MapFrom(src => src.ContactType.TypeName))
-            .ForMember(dest => dest.ContactTypeId,
-                opt => opt.MapFrom(src => src.ContactType.Id));
+            // ProfileSettings -> ProfileSettingsDto (без кастомних мап)
+            config.ForType<ProfileSettings, ProfileSettingsDto>();
 
-            CreateMap<ProfileSettings, ProfileSettingsDto>();
+            config.ForType<Language, LanguageDto>();
+            config.ForType<Timezone, TimezoneDto>();
+            config.ForType<Country, CountryDto>();
         }
     }
 }

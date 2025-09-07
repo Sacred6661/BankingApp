@@ -26,6 +26,8 @@ namespace ProfileService.Data.Models
         [Required, MaxLength(200)]
         public string Value { get; set; } = null!;
 
+        public bool IsActive { get; set; } = true;
+
         [ForeignKey(nameof(ContactTypeId))]
         public virtual ContactType ContactType { get; set; } = null!;
 

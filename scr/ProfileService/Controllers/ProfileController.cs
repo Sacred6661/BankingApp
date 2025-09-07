@@ -1,12 +1,14 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using ProfileService.Data;
 using ProfileService.Data.Models;
 using ProfileService.DTOs;
 using ProfileService.Helpers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProfileService.Controllers
 {
@@ -118,8 +120,8 @@ namespace ProfileService.Controllers
                     profileSettings.UserId = profile.UserId;
                 }
 
-                profileSettings.Language = profile.Settings.Language;
-                profileSettings.Timezone = profile.Settings.Timezone;
+                //profileSettings.Language = profile.Settings.Language;
+                //profileSettings.Timezone = profile.Settings.Timezone;
                 profileSettings.NotificationsEnabled = profile.Settings.NotificationsEnabled;
 
                 if (!existing)
@@ -176,7 +178,7 @@ namespace ProfileService.Controllers
                     {
                         dbAddress.AddressLine = address.AddressLine;
                         dbAddress.City = address.City;
-                        dbAddress.Country = address.Country;
+                        //dbAddress.Country = address.Country;
                         dbAddress.ZipCode = address.ZipCode;
                     }
                     else
@@ -186,7 +188,7 @@ namespace ProfileService.Controllers
                             AddressTypeId = address.AddressTypeId,
                             AddressLine = address.AddressLine,
                             City = address.City,
-                            Country = address.Country,
+                            //Country = address.Country,
                             ZipCode = address.ZipCode
                         });
 
@@ -204,5 +206,186 @@ namespace ProfileService.Controllers
 
             return Ok();
         }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/{userId:Guid}/contacts/{contactId:int}")]
+        public async Task<IActionResult> GetContact(Guid userId, int contactId)
+        {
+            var contact = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.Id == contactId);
+            if(contact == null)
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Contact not found",
+                    detail: $"Contact with id '{contactId}' does not exist."
+                );
+
+            var result = mapper.Map<ProfileContactDto>(contact);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/me/contacts/{contactId:int}")]
+        public async Task<IActionResult> GetContact(int contactId)
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await GetContact(userId, contactId);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/{userId:Guid}/contacts")]
+        public async Task<IActionResult> GetContacts(Guid userId)
+        {
+            var contacts = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (contacts == null)
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Contacts not found",
+                    detail: $"Contact with userId '{userId}' does not exist."
+                );
+
+            var result = mapper.Map<List<ProfileContactDto>>(contacts);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/me/contacts")]
+        public async Task<IActionResult> GetContacts()
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await GetContacts(userId);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpPut("profiles/{userId:Guid}/contacts")]
+        public async Task<IActionResult> AddUpdateContact(Guid userId, [FromBody]ProfileContactDto contact)
+        {
+            var dbContact = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.Id == contact.Id);
+            if(dbContact == null)
+            {
+                dbContact = new ProfileContact();
+                dbContact.UserId = userId;
+                dbContact.ContactTypeId = contact.ContactTypeId;
+            }
+
+            dbContact.Value = contact.Value;
+            await dbContext.SaveChangesAsync();
+
+            var result = mapper.Map<ProfileContactDto>(dbContact);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpPut("profiles/me/contacts")]
+        public async Task<IActionResult> AddUpdateContact([FromBody] ProfileContactDto contact)
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await AddUpdateContact(userId, contact);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/{userId:Guid}/adresses/{addressId:int}")]
+        public async Task<IActionResult> GetAddress(Guid userId, int addressId)
+        {
+            var adress = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.Id == addressId);
+            if (adress == null)
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Contact not found",
+                    detail: $"Contact with id '{addressId}' does not exist."
+                );
+
+            var result = mapper.Map<ProfileAddressDto>(adress);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/me/adresses/{addressId:int}")]
+        public async Task<IActionResult> GetAddress(int addressId)
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await GetAddress(userId, addressId);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/{userId:Guid}/adresses")]
+        public async Task<IActionResult> GetAddresses(Guid userId)
+        {
+            var contacts = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (contacts == null)
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Contacts not found",
+                    detail: $"Contact with userId '{userId}' does not exist."
+                );
+
+            var result = mapper.Map<List<ProfileAddressDto>>(contacts);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/me/adresses")]
+        public async Task<IActionResult> GetAddresses()
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await GetAddresses(userId);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpPut("profiles/{userId:Guid}/addresses")]
+        public async Task<IActionResult> AddUpdateAddress(Guid userId, [FromBody] ProfileAddressDto address)
+        {
+            var dbAddress = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.Id == address.Id);
+            if (dbAddress == null)
+            {
+                dbAddress = new ProfileAddress();
+                dbAddress.UserId = userId;
+                dbAddress.AddressTypeId = address.AddressTypeId;
+            }
+
+            dbAddress.AddressLine = address.AddressLine;
+            //dbAddress.Country = address.Country;
+            dbAddress.City = address.City;
+            dbAddress.ZipCode = address.ZipCode;
+            await dbContext.SaveChangesAsync();
+
+            var result = mapper.Map<ProfileAddressDto>(dbAddress);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpPut("profiles/me/addresses")]
+        public async Task<IActionResult> AddUpdateAddress([FromBody] ProfileContactDto contact)
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await AddUpdateContact(userId, contact);
+        }
+
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/languages")]
+        public async Task<IActionResult> GetLanguages()
+        {
+            var languages = await dbContext.Languages.ToListAsync();
+            var result = mapper.Map<List<LanguageDto>>(languages);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/timezones")]
+        public async Task<IActionResult> GetTimezones()
+        {
+            var timezones = await dbContext.Timezones.ToListAsync();
+            var result = mapper.Map<List<TimezoneDto>>(timezones);
+
+            return Ok(result);
+        }
+
     }
 }
