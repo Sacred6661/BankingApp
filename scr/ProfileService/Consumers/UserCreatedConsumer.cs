@@ -24,29 +24,43 @@ namespace ProfileService.Consumers
             var email = msg.Email;
 
             var profile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
-            if (profile == null)
+            try
             {
-                var addProfile = new Profile
+                if (profile == null)
                 {
-                    UserId = userId,
-                    Contacts = new List<ProfileContact>(),
-                    Settings = new ProfileSettings()
-                };
+                    var addProfile = new Profile
+                    {
+                        UserId = userId,
+                        Email = email,
+                        Contacts = new List<ProfileContact>(),
+                        Settings = new ProfileSettings()
+                    };
 
-                addProfile.Contacts.Add(new ProfileContact
-                {
-                    UserId = userId,
-                    ContactTypeEnum = ContactTypeEnum.PrimaryEmail,
-                    Value = email
-                });
+                    addProfile.Contacts.Add(new ProfileContact
+                    {
+                        UserId = userId,
+                        ContactTypeEnum = ContactTypeEnum.PrimaryEmail,
+                        Value = email
+                    });
 
-                addProfile.Settings = new ProfileSettings
-                {
-                    UserId = userId
-                };
+                    addProfile.Settings = new ProfileSettings
+                    {
+                        UserId = userId
+                    };
 
-                _dbContext.Profiles.Add(addProfile);
-                await _dbContext.SaveChangesAsync();
+                    _dbContext.Profiles.Add(addProfile);
+                    await _dbContext.SaveChangesAsync();
+
+
+                    _dbContext.ChangeTracker.DetectChanges();
+                    foreach (var entry in _dbContext.ChangeTracker.Entries())
+                    {
+                        Debug.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
             }
         }
     }

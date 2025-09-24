@@ -8,9 +8,9 @@ namespace ProfileService.Data.Models
         [Key, ForeignKey(nameof(Profile))] // PK одночасно є FK
         public Guid UserId { get; set; }
 
-        public int LanguageId { get; set; }
+        public int? LanguageId { get; set; }
 
-        public int TimeZoneId { get; set; }
+        public int? TimeZoneId { get; set; }
 
         public bool NotificationsEnabled { get; set; } = true;
 

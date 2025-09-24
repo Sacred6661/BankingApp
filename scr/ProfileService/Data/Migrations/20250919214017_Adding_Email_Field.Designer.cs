@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -11,9 +12,11 @@ using ProfileService.Data;
 namespace ProfileService.Data.Migrations
 {
     [DbContext(typeof(ProfileDbContext))]
-    partial class ProfileDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250919214017_Adding_Email_Field")]
+    partial class Adding_Email_Field
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,13 +240,13 @@ namespace ProfileService.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("LanguageId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("NotificationsEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("TimeZoneId")
+                    b.Property<int>("TimeZoneId")
                         .HasColumnType("integer");
 
                     b.HasKey("UserId");
@@ -334,11 +337,15 @@ namespace ProfileService.Data.Migrations
                 {
                     b.HasOne("ProfileService.Data.Models.Language", "Language")
                         .WithMany("ProfileSettings")
-                        .HasForeignKey("LanguageId");
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ProfileService.Data.Models.Timezone", "Timezone")
                         .WithMany("ProfileSettings")
-                        .HasForeignKey("TimeZoneId");
+                        .HasForeignKey("TimeZoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ProfileService.Data.Models.Profile", "Profile")
                         .WithOne("Settings")

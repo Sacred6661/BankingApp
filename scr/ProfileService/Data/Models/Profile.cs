@@ -14,7 +14,9 @@ namespace ProfileService.Data.Models
         public string LastName { get; set; } = null!;
 
         [MaxLength(500)]
-        public string? AvatarUrl { get; set; }
+        public string AvatarUrl { get; set; }
+
+        public string Email {  get; set; }
 
         public DateTime? Birthday { get; set; }
 

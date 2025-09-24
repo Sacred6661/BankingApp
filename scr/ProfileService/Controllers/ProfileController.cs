@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,8 @@ namespace ProfileService.Controllers
             var profile = await dbContext.Profiles
                 .Include(p => p.Contacts).ThenInclude(c => c.ContactType)
                 .Include(p => p.Addresses).ThenInclude(a => a.AddressType)
-                .Include(p => p.Settings)
+                .Include(p => p.Settings).ThenInclude(p => p.Language)
+                .Include(p => p.Settings).ThenInclude(p => p.Timezone)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
 
             if (profile == null)
@@ -88,121 +90,54 @@ namespace ProfileService.Controllers
                     detail: $"User with userId '{userId}' adn '{userRole}' is not allowed to update another user account"
                 );
 
-            try
+            var userProfile = await dbContext.Profiles.Include(p => p.Settings).FirstOrDefaultAsync(p => p.UserId == userId);
+
+            if (userProfile == null)
             {
-                var existing = true;
-                var userProfile = await dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
-
-                // Profile part update or create if not exists
-                if (userProfile == null)
+                var newProfile = new Data.Models.Profile
                 {
-                    existing = false;
-                    userProfile = new Data.Models.Profile();
-                    userProfile.UserId = profile.UserId;
-                }
+                    UserId = userId,
+                    Email = profile.Email,
+                    FirstName = profile.FirstName,
+                    LastName = profile.LastName,
+                    AvatarUrl = profile.AvatarUrl,
+                    Birthday = profile.Birthday,
+                    Contacts = new List<ProfileContact>(),
+                    Settings = new ProfileSettings()
+                };
 
-                userProfile.FirstName = profile.FirstName;
-                userProfile.LastName = profile.LastName;
-                userProfile.AvatarUrl = profile.AvatarUrl;
-                userProfile.Birthday = profile.Birthday;
-                userProfile.UpdatedAt = DateTime.UtcNow;
-
-                if (!existing)
-                    dbContext.Profiles.Add(userProfile);
-
-                // Profile settings part update or create if not exists
-                existing = true;
-                var profileSettings = await dbContext.ProfileSettings.FirstOrDefaultAsync(s => s.UserId == profile.UserId);
-                if (profileSettings == null)
+                newProfile.Contacts.Add(new ProfileContact
                 {
-                    existing = false;
-                    profileSettings = new ProfileSettings();
-                    profileSettings.UserId = profile.UserId;
-                }
+                    UserId = userId,
+                    ContactTypeEnum = ContactTypeEnum.PrimaryEmail,
+                    Value = profile.Email
+                });
 
-                //profileSettings.Language = profile.Settings.Language;
-                //profileSettings.Timezone = profile.Settings.Timezone;
-                profileSettings.NotificationsEnabled = profile.Settings.NotificationsEnabled;
+                newProfile.Settings = new ProfileSettings
+                {
+                    UserId = userId,
+                    LanguageId = profile.Settings.LanguageId,
+                    TimeZoneId = profile.Settings.TimezoneId,
+                    NotificationsEnabled = profile.Settings.NotificationsEnabled
+                };
 
-                if (!existing)
-                    dbContext.ProfileSettings.Add(profileSettings);
-
+                dbContext.Profiles.Add(newProfile);
                 await dbContext.SaveChangesAsync();
-            }
-            catch(Exception ex)
-            {
-                logger.LogError("Error while adding profile and profile settings", ex);
-                return Problem(
-                   statusCode: StatusCodes.Status500InternalServerError,
-                   title: "Error while adding profile and profile setting",
-                   detail: $"Error while adding profile and profile setting.");
+
+                return Ok();
             }
 
-            try
-            {
-                foreach (var contact in profile.Contacts)
-                {
-                    var dbContact = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.Id == contact.Id);
+            userProfile.FirstName = profile.FirstName;
+            userProfile.LastName = profile.LastName;
+            userProfile.AvatarUrl = profile.AvatarUrl;
+            userProfile.Birthday = profile.Birthday;
+            userProfile.UpdatedAt = DateTime.UtcNow;
 
-                    if (dbContact != null && contact.ContactTypeId == (int)ContactTypeEnum.PrimaryEmail)
-                        continue;
+            userProfile.Settings.TimeZoneId = profile.Settings.TimezoneId;
+            userProfile.Settings.LanguageId = profile.Settings.LanguageId;
+            userProfile.Settings.NotificationsEnabled = profile.Settings.NotificationsEnabled;
 
-                    if (dbContact != null)
-                        dbContact.Value = contact.Value;
-                    else
-                        dbContext.ProfileContacts.Add(new ProfileContact
-                        {
-                            UserId = profile.UserId,
-                            ContactTypeId = contact.ContactTypeId,
-                            Value = contact.Value
-                        });
-
-                    await dbContext.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError("Error while adding contacts", ex);
-                return Problem(
-                   statusCode: StatusCodes.Status500InternalServerError,
-                   title: "Error while adding contacts",
-                   detail: $"Server error while adding contacts");
-            }
-
-            try
-            {
-                foreach (var address in profile.Addresses)
-                {
-                    var dbAddress = await dbContext.ProfileAddresses.FirstOrDefaultAsync(a => a.Id == address.Id);
-                    if (dbAddress != null)
-                    {
-                        dbAddress.AddressLine = address.AddressLine;
-                        dbAddress.City = address.City;
-                        //dbAddress.Country = address.Country;
-                        dbAddress.ZipCode = address.ZipCode;
-                    }
-                    else
-                        dbContext.ProfileAddresses.Add(new ProfileAddress
-                        {
-                            UserId = profile.UserId,
-                            AddressTypeId = address.AddressTypeId,
-                            AddressLine = address.AddressLine,
-                            City = address.City,
-                            //Country = address.Country,
-                            ZipCode = address.ZipCode
-                        });
-
-                    await dbContext.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError("Error while adding addresses", ex);
-                return Problem(
-                   statusCode: StatusCodes.Status500InternalServerError,
-                   title: "Error while adding addresses",
-                   detail: $"Server error while adding addresses");
-            }
+            await dbContext.SaveChangesAsync();
 
             return Ok();
         }
@@ -236,12 +171,12 @@ namespace ProfileService.Controllers
         [HttpGet("profiles/{userId:Guid}/contacts")]
         public async Task<IActionResult> GetContacts(Guid userId)
         {
-            var contacts = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.UserId == userId);
+            var contacts = await dbContext.ProfileContacts.Include(c => c.ContactType).Where(c => c.UserId == userId)?.ToListAsync();
             if (contacts == null)
                 return Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     title: "Contacts not found",
-                    detail: $"Contact with userId '{userId}' does not exist."
+                    detail: $"Contacts with userId '{userId}' does not exist."
                 );
 
             var result = mapper.Map<List<ProfileContactDto>>(contacts);
@@ -261,16 +196,25 @@ namespace ProfileService.Controllers
         [HttpPut("profiles/{userId:Guid}/contacts")]
         public async Task<IActionResult> AddUpdateContact(Guid userId, [FromBody]ProfileContactDto contact)
         {
-            var dbContact = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.Id == contact.Id);
+            var dbContact = await dbContext.ProfileContacts.Include(c => c.ContactType).FirstOrDefaultAsync(c => c.Id == contact.Id);
             if(dbContact == null)
             {
                 dbContact = new ProfileContact();
                 dbContact.UserId = userId;
                 dbContact.ContactTypeId = contact.ContactTypeId;
+                dbContact.Value = contact.Value;
+
+                dbContext.Add(dbContact);
+            }
+            else
+            {
+                dbContact.Value = contact.Value;
             }
 
-            dbContact.Value = contact.Value;
+
             await dbContext.SaveChangesAsync();
+
+            await dbContext.Entry(dbContact).Reference(c => c.ContactType).LoadAsync();
 
             var result = mapper.Map<ProfileContactDto>(dbContact);
 
@@ -286,6 +230,35 @@ namespace ProfileService.Controllers
         }
 
         [Authorize(Policy = "RequireUserId")]
+        [HttpDelete("profiles/{userId:Guid}/contacts/{contactId:int}")]
+        public async Task<IActionResult> DeleteContact(Guid userId, int contactId)
+        {
+            var dbContact = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.UserId == userId && c.Id == contactId);
+
+            if(dbContact == null)
+                return Problem(
+                  statusCode: StatusCodes.Status404NotFound,
+                  title: "Contact not found",
+                  detail: $"Contact with id '{contactId}' does not exist."
+              );
+
+            dbContact.IsActive = false;
+            await dbContext.SaveChangesAsync();
+
+            var result = mapper.Map<ProfileContactDto>(dbContact);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpDelete("profiles/me/contacts/{contactId:int}")]
+        public async Task<IActionResult> DeleteContact(int contactId)
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await DeleteContact(userId, contactId);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
         [HttpGet("profiles/{userId:Guid}/adresses/{addressId:int}")]
         public async Task<IActionResult> GetAddress(Guid userId, int addressId)
         {
@@ -293,8 +266,8 @@ namespace ProfileService.Controllers
             if (adress == null)
                 return Problem(
                     statusCode: StatusCodes.Status404NotFound,
-                    title: "Contact not found",
-                    detail: $"Contact with id '{addressId}' does not exist."
+                    title: "Address not found",
+                    detail: $"Address with id '{addressId}' does not exist."
                 );
 
             var result = mapper.Map<ProfileAddressDto>(adress);
@@ -311,15 +284,17 @@ namespace ProfileService.Controllers
         }
 
         [Authorize(Policy = "RequireUserId")]
-        [HttpGet("profiles/{userId:Guid}/adresses")]
+        [HttpGet("profiles/{userId:Guid}/addresses")]
         public async Task<IActionResult> GetAddresses(Guid userId)
         {
-            var contacts = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.UserId == userId);
+            var contacts = await dbContext.ProfileAddresses.Include(c => c.AddressType)
+                .Where(c => c.UserId == userId).ToListAsync();
+
             if (contacts == null)
                 return Problem(
                     statusCode: StatusCodes.Status404NotFound,
-                    title: "Contacts not found",
-                    detail: $"Contact with userId '{userId}' does not exist."
+                    title: "Address not found",
+                    detail: $"Address with userId '{userId}' does not exist."
                 );
 
             var result = mapper.Map<List<ProfileAddressDto>>(contacts);
@@ -328,7 +303,7 @@ namespace ProfileService.Controllers
         }
 
         [Authorize(Policy = "RequireUserId")]
-        [HttpGet("profiles/me/adresses")]
+        [HttpGet("profiles/me/addresses")]
         public async Task<IActionResult> GetAddresses()
         {
             var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
@@ -345,13 +320,26 @@ namespace ProfileService.Controllers
                 dbAddress = new ProfileAddress();
                 dbAddress.UserId = userId;
                 dbAddress.AddressTypeId = address.AddressTypeId;
+
+                dbAddress.AddressLine = address.AddressLine;
+                dbAddress.CountryId = address.CountryId;
+                dbAddress.City = address.City;
+                dbAddress.ZipCode = address.ZipCode;
+
+                dbContext.Add(dbAddress);
+            }
+            else
+            {
+                dbAddress.AddressLine = address.AddressLine;
+                dbAddress.CountryId = address.CountryId;
+                dbAddress.City = address.City;
+                dbAddress.ZipCode = address.ZipCode;
             }
 
-            dbAddress.AddressLine = address.AddressLine;
-            //dbAddress.Country = address.Country;
-            dbAddress.City = address.City;
-            dbAddress.ZipCode = address.ZipCode;
             await dbContext.SaveChangesAsync();
+
+            await dbContext.Entry(dbAddress).Reference(c => c.AddressType).LoadAsync();
+            await dbContext.Entry(dbAddress).Reference(c => c.Country).LoadAsync();
 
             var result = mapper.Map<ProfileAddressDto>(dbAddress);
 
@@ -360,12 +348,60 @@ namespace ProfileService.Controllers
 
         [Authorize(Policy = "RequireUserId")]
         [HttpPut("profiles/me/addresses")]
-        public async Task<IActionResult> AddUpdateAddress([FromBody] ProfileContactDto contact)
+        public async Task<IActionResult> AddUpdateAddress([FromBody] ProfileAddressDto contact)
         {
             var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
-            return await AddUpdateContact(userId, contact);
+            return await AddUpdateAddress(userId, contact);
         }
 
+        [Authorize(Policy = "RequireUserId")]
+        [HttpDelete("profiles/{userId:Guid}/addresses/{contactId:int}")]
+        public async Task<IActionResult> DeleteAddress(Guid userId, int contactId)
+        {
+            var dbAddress = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.UserId == userId && c.Id == contactId);
+
+            if (dbAddress == null)
+                return Problem(
+                  statusCode: StatusCodes.Status404NotFound,
+                  title: "Address not found",
+                  detail: $"Address with id '{contactId}' does not exist."
+              );
+
+            dbAddress.IsActive = false;
+            await dbContext.SaveChangesAsync();
+
+            var result = mapper.Map<ProfileAddressDto>(dbAddress);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpDelete("profiles/me/addresses/{contactId:int}")]
+        public async Task<IActionResult> DeleteAddress(int contactId)
+        {
+            var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
+            return await DeleteAddress(userId, contactId);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/addresstypes")]
+        public async Task<IActionResult> GetAddressTypes()
+        {
+            var addressTypes = await dbContext.AddressTypes.Where(a => a.IsActive).ToListAsync();
+            var result = mapper.Map<List<AddressTypeDto>>(addressTypes);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/contacttypes")]
+        public async Task<IActionResult> GetContactTypes()
+        {
+            var contactTypes = await dbContext.ContactTypes.Where(a => a.IsActive).ToListAsync();
+            var result = mapper.Map<List<ContactTypeDto>>(contactTypes);
+
+            return Ok(result);
+        }
 
         [Authorize(Policy = "RequireUserId")]
         [HttpGet("profiles/languages")]
@@ -383,6 +419,16 @@ namespace ProfileService.Controllers
         {
             var timezones = await dbContext.Timezones.ToListAsync();
             var result = mapper.Map<List<TimezoneDto>>(timezones);
+
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("profiles/countries")]
+        public async Task<IActionResult> GetCountries()
+        {
+            var countries = await dbContext.Countries.ToListAsync();
+            var result = mapper.Map<List<CountryDto>>(countries);
 
             return Ok(result);
         }
