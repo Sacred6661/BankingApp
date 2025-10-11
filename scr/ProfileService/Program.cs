@@ -86,7 +86,7 @@ builder.Services.AddMassTransit(x =>
 var app = builder.Build();
 
 LoggingSetup.UseCorrelationLogging(app);
-
+ 
 await InitializeDatabase.DropDatabasesAsync(app.Services);
 await InitializeDatabase.InitDbAsync(app.Services);
 await InitializeDatabase.SeedContactTypesAsync(app.Services);

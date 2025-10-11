@@ -11,6 +11,8 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
+import { Link } from "react-router-dom";
+import { getErrorMessage } from "../utils/errorHelpers";
 
 export default function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -95,9 +97,20 @@ export default function LoginPage() {
 
           {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
+              {getErrorMessage(error)}
             </Alert>
           )}
+
+          {/* Link to Register */}
+          <Typography variant="body2" align="center" mt={3}>
+            Don’t have an account?{" "}
+            <Link
+              to="/register"
+              style={{ textDecoration: "none", color: "#1976d2" }}
+            >
+              Register
+            </Link>
+          </Typography>
         </Box>
       </Box>
     </Container>

@@ -21,6 +21,11 @@ export interface LoginRequest {
     email: string;
     roles: string[];
   }
+
+  export interface RegisterRequest {
+    email: string;
+    password: string;
+  }
   
   export const authService = {
     login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -30,6 +35,11 @@ export interface LoginRequest {
   
     refreshToken: async (data: RefreshTokenRequest): Promise<LoginResponse> => {
       const response = await axiosClient.post<LoginResponse>("/auth/refresh-token", data);
+      return response.data;
+    },
+
+    register: async (data: RegisterRequest): Promise<LoginResponse> => {
+      const response = await axiosClient.post<LoginResponse>("/auth/register", data);
       return response.data;
     },
 

@@ -90,7 +90,10 @@ namespace ProfileService.Controllers
                     detail: $"User with userId '{userId}' adn '{userRole}' is not allowed to update another user account"
                 );
 
-            var userProfile = await dbContext.Profiles.Include(p => p.Settings).FirstOrDefaultAsync(p => p.UserId == userId);
+            var userProfile = await dbContext.Profiles.Include(p => p.Settings).
+                Include(c => c.Contacts).ThenInclude(c => c.ContactType)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+            var result = new ProfileDto();
 
             if (userProfile == null)
             {
@@ -124,7 +127,15 @@ namespace ProfileService.Controllers
                 dbContext.Profiles.Add(newProfile);
                 await dbContext.SaveChangesAsync();
 
-                return Ok();
+                await dbContext.Entry(newProfile).Collection(p => p.Contacts).Query().Include(c => c.ContactType).LoadAsync();
+                await dbContext.Entry(newProfile).Collection(p => p.Addresses).Query().Include(c => c.AddressType).LoadAsync();
+                await dbContext.Entry(newProfile).Collection(p => p.Addresses).Query().Include(c => c.Country).LoadAsync();
+                await dbContext.Entry(newProfile).Reference(p => p.Settings).Query().Include(s => s.Language).Include(s => s.Timezone).LoadAsync();
+
+
+                result = mapper.Map<ProfileDto>(newProfile);
+
+                return Ok(result);
             }
 
             userProfile.FirstName = profile.FirstName;
@@ -139,7 +150,11 @@ namespace ProfileService.Controllers
 
             await dbContext.SaveChangesAsync();
 
-            return Ok();
+            await dbContext.Entry(userProfile).Reference(p => p.Settings).Query().Include(s => s.Language).Include(s => s.Timezone).LoadAsync();
+
+            result = mapper.Map<ProfileDto>(userProfile);
+
+            return Ok(result);
         }
 
         [Authorize(Policy = "RequireUserId")]
@@ -196,7 +211,9 @@ namespace ProfileService.Controllers
         [HttpPut("profiles/{userId:Guid}/contacts")]
         public async Task<IActionResult> AddUpdateContact(Guid userId, [FromBody]ProfileContactDto contact)
         {
-            var dbContact = await dbContext.ProfileContacts.Include(c => c.ContactType).FirstOrDefaultAsync(c => c.Id == contact.Id);
+            var dbContact = await dbContext.ProfileContacts.Include(c => c.ContactType)
+                .FirstOrDefaultAsync(c => c.Id == contact.Id && c.UserId == userId && c.ContactTypeId == contact.ContactTypeId);
+
             if(dbContact == null)
             {
                 dbContact = new ProfileContact();
@@ -209,11 +226,10 @@ namespace ProfileService.Controllers
             else
             {
                 dbContact.Value = contact.Value;
+                dbContact.IsActive = contact.IsActive;
             }
 
-
             await dbContext.SaveChangesAsync();
-
             await dbContext.Entry(dbContact).Reference(c => c.ContactType).LoadAsync();
 
             var result = mapper.Map<ProfileContactDto>(dbContact);
@@ -233,7 +249,8 @@ namespace ProfileService.Controllers
         [HttpDelete("profiles/{userId:Guid}/contacts/{contactId:int}")]
         public async Task<IActionResult> DeleteContact(Guid userId, int contactId)
         {
-            var dbContact = await dbContext.ProfileContacts.FirstOrDefaultAsync(c => c.UserId == userId && c.Id == contactId);
+            var dbContact = await dbContext.ProfileContacts.Include(c => c.ContactType)
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.Id == contactId);
 
             if(dbContact == null)
                 return Problem(
@@ -314,7 +331,9 @@ namespace ProfileService.Controllers
         [HttpPut("profiles/{userId:Guid}/addresses")]
         public async Task<IActionResult> AddUpdateAddress(Guid userId, [FromBody] ProfileAddressDto address)
         {
-            var dbAddress = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.Id == address.Id);
+            var dbAddress = await dbContext.ProfileAddresses
+                .FirstOrDefaultAsync(a => a.Id == address.Id && a.UserId == userId && a.AddressTypeId == address.AddressTypeId);
+
             if (dbAddress == null)
             {
                 dbAddress = new ProfileAddress();
@@ -334,6 +353,7 @@ namespace ProfileService.Controllers
                 dbAddress.CountryId = address.CountryId;
                 dbAddress.City = address.City;
                 dbAddress.ZipCode = address.ZipCode;
+                dbAddress.IsActive = address.IsActive;
             }
 
             await dbContext.SaveChangesAsync();
@@ -358,7 +378,8 @@ namespace ProfileService.Controllers
         [HttpDelete("profiles/{userId:Guid}/addresses/{contactId:int}")]
         public async Task<IActionResult> DeleteAddress(Guid userId, int contactId)
         {
-            var dbAddress = await dbContext.ProfileAddresses.FirstOrDefaultAsync(c => c.UserId == userId && c.Id == contactId);
+            var dbAddress = await dbContext.ProfileAddresses.Include(a => a.AddressType).Include(a => a.Country)
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.Id == contactId);
 
             if (dbAddress == null)
                 return Problem(

@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authService } from "../../api/authService";
-import type { LoginRequest, LoginResponse } from "../../api/authService";
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  MeResponse,
+} from "../../api/authService";
 
 interface AuthState {
   token: string | null;
@@ -8,7 +13,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  user: any | null;
+  user: MeResponse | null;
 }
 
 const initialState: AuthState = {
@@ -20,7 +25,7 @@ const initialState: AuthState = {
   user: null,
 };
 
-// thunk for logign
+// login
 export const login = createAsyncThunk<LoginResponse, LoginRequest>(
   "auth/login",
   async (credentials, thunkAPI) => {
@@ -32,12 +37,24 @@ export const login = createAsyncThunk<LoginResponse, LoginRequest>(
   }
 );
 
-// thunk for session check (me)
-export const fetchMe = createAsyncThunk(
+// register
+export const register = createAsyncThunk<LoginResponse, RegisterRequest>(
+  "auth/register",
+  async (data, thunkAPI) => {
+    try {
+      return await authService.register(data);
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err.response?.data || "Register failed");
+    }
+  }
+);
+
+// 🔹 fetchMe
+export const fetchMe = createAsyncThunk<MeResponse>(
   "auth/me",
   async (_, thunkAPI) => {
     try {
-      return await authService.me(); // server returns user data
+      return await authService.me();
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Unauthorized");
     }
@@ -57,8 +74,8 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // login
     builder
-      // login
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -72,9 +89,27 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload;
-      })
+      });
 
-      // fetchMe
+    // register
+    builder
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        state.isAuthenticated = true;
+      })
+      .addCase(register.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // fetchMe
+    builder
       .addCase(fetchMe.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -82,7 +117,7 @@ const authSlice = createSlice({
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
-        state.user = action.payload; // saving user from backend
+        state.user = action.payload;
       })
       .addCase(fetchMe.rejected, (state) => {
         state.loading = false;
