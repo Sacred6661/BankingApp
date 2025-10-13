@@ -12,7 +12,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import type {
   ProfileAddressDto,
-  ContactTypeDto,
+  AddressTypeDto,
 } from "../../../api/profileService";
 import { VirtualizedAutocomplete } from "../../../components/ui/VirtualizedAutocomplete";
 
@@ -22,7 +22,7 @@ interface AddressDialogProps {
   onSave: (address: ProfileAddressDto) => void;
   address?: ProfileAddressDto;
   existingAddresses: ProfileAddressDto[];
-  addressTypes: ContactTypeDto[];
+  addressTypes: AddressTypeDto[];
   countries: { id: number; name: string }[];
 }
 

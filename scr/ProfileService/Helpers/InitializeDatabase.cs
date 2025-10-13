@@ -73,25 +73,33 @@ namespace ProfileService.Helpers
                 {
                     Id = (int)ContactTypeEnum.PrimaryEmail,
                     TypeName = "Primary Email",
-                    TypeDescription = "Primry Email address that cann't be changed"
+                    TypeDescription = "Primry Email address that cann't be changed",
+                    Code = "PRIMARY_EMAIL",
+                    RegexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
                 },
                 new ContactType
                 {
                     Id = (int)ContactTypeEnum.Email,
                     TypeName = "Email",
-                    TypeDescription = "Email address"
+                    TypeDescription = "Email address",
+                    Code = "EMAIL",
+                    RegexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
                 },
                 new ContactType
                 {
                     Id = (int)ContactTypeEnum.Phone,
                     TypeName = "Phone",
-                    TypeDescription = "Phone number"
+                    TypeDescription = "Phone number",
+                    Code = "PHONE",
+                    RegexPattern = "^\\+?[0-9]{7,15}$"
                 },
                 new ContactType
                 {
                     Id = (int)ContactTypeEnum.Telegram,
                     TypeName = "Telegram",
-                    TypeDescription = "Telegram username"
+                    TypeDescription = "Telegram username",
+                    Code = "TELEGRAM",
+                    RegexPattern = "^@[A-Za-z0-9_]{5,}$"
                 }
             };
 

@@ -81,6 +81,8 @@ export interface ContactTypeDto {
   typeName: string;
   typeDescription: string;
   isActive?: boolean;
+  code: string;
+  regexPattern: string;
 }
 
 // ---- Pagination ----

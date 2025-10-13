@@ -60,7 +60,7 @@ export default function ProfilePage() {
     address?: ProfileAddressDto;
   }>({ open: false });
 
-  const [defaultProfile, setDefaultProfile] = useState<ProfileDto>({
+  const [defaultProfile] = useState<ProfileDto>({
     userId: "",
     firstName: "",
     lastName: "",
