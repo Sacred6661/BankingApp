@@ -73,6 +73,7 @@ const ContactDialog: React.FC<ContactDialogProps> = ({
     if (open && !contact) {
       formik.resetForm({ values: { contactTypeId: 0, value: "" } });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, contact]);
 
   const selectedType = useMemo(
@@ -103,6 +104,7 @@ const ContactDialog: React.FC<ContactDialogProps> = ({
         value: validation,
       }),
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedType]);
 
   // 🟢 Підтягування шаблонів
@@ -132,6 +134,7 @@ const ContactDialog: React.FC<ContactDialogProps> = ({
     }, 0);
 
     return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.contactTypeId]);
 
   // 🟢 Рендер поля
