@@ -34,7 +34,7 @@ export const login = createAsyncThunk<LoginResponse, LoginRequest>(
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Login failed");
     }
-  }
+  },
 );
 
 // register
@@ -46,7 +46,7 @@ export const register = createAsyncThunk<LoginResponse, RegisterRequest>(
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Register failed");
     }
-  }
+  },
 );
 
 // 🔹 fetchMe
@@ -58,7 +58,7 @@ export const fetchMe = createAsyncThunk<MeResponse>(
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Unauthorized");
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
@@ -71,6 +71,9 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
       state.user = null;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -127,5 +130,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;

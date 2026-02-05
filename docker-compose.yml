@@ -5,7 +5,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
     volumes:
-      - postgres_users_data:/var/lib/postgresql/data
+      - postgres_users_banking_data:/var/lib/postgresql
     ports:
       - "5433:5432"
 
@@ -15,7 +15,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
     volumes:
-      - postgres-accounts_data:/var/lib/postgresql/data
+      - postgres-accounts_banking_data:/var/lib/postgresql
     ports:
       - "5434:5432"
 
@@ -25,7 +25,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
     volumes:
-      - postgres-transactions_data:/var/lib/postgresql/data
+      - postgres-transactions_banking_data:/var/lib/postgresql
     ports:
       - "5435:5432"
 
@@ -35,7 +35,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
     volumes:
-      - postgres-profile_data:/var/lib/postgresql/data
+      - postgres-profile_banking_data:/var/lib/postgresql
     ports:
       - "5436:5432"
 
@@ -73,9 +73,9 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: mongodbpwd
       ME_CONFIG_MONGODB_SERVER: mongodb-histories
 
-  rabbitmq:
+  banking-rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq-banking
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: guest
@@ -169,7 +169,7 @@ services:
       - authserver
     volumes:
       - apigateway_logs:/app/logs
-  
+
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.15.0
     container_name: filebeat
@@ -196,10 +196,10 @@ services:
     command: filebeat -e -strict.perms=false
 
 volumes:
-  postgres_users_data:
-  postgres-accounts_data:
-  postgres-transactions_data:
-  postgres-profile_data:
+  postgres_users_banking_data:
+  postgres-accounts_banking_data:
+  postgres-transactions_banking_data:
+  postgres-profile_banking_data:
   mongodb_histories_data:
   es_data:
   accountservice_logs:

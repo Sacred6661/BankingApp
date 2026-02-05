@@ -36,7 +36,7 @@ export const authService = {
   refreshToken: async (data: RefreshTokenRequest): Promise<LoginResponse> => {
     const response = await axiosClient.post<LoginResponse>(
       "/auth/refresh-token",
-      data
+      data,
     );
     return response.data;
   },
@@ -44,7 +44,7 @@ export const authService = {
   register: async (data: RegisterRequest): Promise<LoginResponse> => {
     const response = await axiosClient.post<LoginResponse>(
       "/auth/register",
-      data
+      data,
     );
     return response.data;
   },

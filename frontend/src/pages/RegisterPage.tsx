@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../app/store";
-import { register } from "../features/auth/authSlice";
+import { register, clearError } from "../features/auth/authSlice";
 import {
   Container,
   Box,
@@ -12,6 +12,9 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { getErrorMessage } from "../utils/errorHelpers";
+import PasswordRequirements from "../features/auth/components/PasswordRequirements";
+import { isPasswordValid } from "../features/auth/utils/passwordRules";
 
 export default function RegisterPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,15 +24,16 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const passwordsMatch = password === confirmPassword;
+  const passwordIsValid = isPasswordValid(password);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) return;
+    if (!passwordIsValid || !passwordsMatch) return;
 
     dispatch(register({ email, password }));
   };
-
-  const passwordsMatch = password === confirmPassword;
 
   return (
     <Container maxWidth="sm">
@@ -75,6 +79,8 @@ export default function RegisterPage() {
             required
           />
 
+          <PasswordRequirements password={password} />
+
           <TextField
             label="Confirm Password"
             type="password"
@@ -97,10 +103,11 @@ export default function RegisterPage() {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={loading || !passwordsMatch}
+              disabled={loading || !passwordsMatch || !passwordIsValid}
             >
               Register
             </Button>
+
             {loading && (
               <CircularProgress
                 size={24}
@@ -118,13 +125,17 @@ export default function RegisterPage() {
 
           {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
+              {getErrorMessage(error)}
             </Alert>
           )}
 
           <Typography variant="body2" textAlign="center" mt={3}>
             Already have an account?{" "}
-            <Link to="/login" style={{ textDecoration: "none" }}>
+            <Link
+              to="/login"
+              style={{ textDecoration: "none", color: "#1976d2" }}
+              onClick={() => dispatch(clearError())}
+            >
               Login here
             </Link>
           </Typography>

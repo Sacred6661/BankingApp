@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../app/store";
-import { login } from "../features/auth/authSlice";
+import { login, clearError } from "../features/auth/authSlice";
 import {
   Container,
   Box,
@@ -107,6 +107,7 @@ export default function LoginPage() {
             <Link
               to="/register"
               style={{ textDecoration: "none", color: "#1976d2" }}
+              onClick={() => dispatch(clearError())}
             >
               Register
             </Link>

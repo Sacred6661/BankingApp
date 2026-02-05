@@ -27,6 +27,9 @@ function Test-PortOpen {
 # can be removed and if there are some problems - run stop-service-local.bat
 Get-Process dotnet -ErrorAction SilentlyContinue | ForEach-Object { $_.Kill() }
 
+# variable for correct directory Path
+$RepoRoot = Resolve-Path "$PSScriptRoot\.."
+
 # clear log file
 $logFile = "authserver_error.log"
 if (Test-Path $logFile) {
@@ -34,7 +37,12 @@ if (Test-Path $logFile) {
 }
 
 Write-Host "`nStarting AuthServer with HTTPS profile..." -ForegroundColor Cyan
-$authProcess = Start-Process "dotnet" -ArgumentList 'run --launch-profile "https" --project ../scr/AuthServer' -PassThru -RedirectStandardError $logFile -NoNewWindow
+Start-Process "dotnet" `
+    -WorkingDirectory $RepoRoot `
+    -ArgumentList 'run --launch-profile "https" --project scr\AuthServer' `
+    -PassThru `
+    -NoNewWindow
+	-RedirectStandardError $logFile
 
 if ($authProcess.HasExited) {
     Write-Host "AuthServer failed to start" -ForegroundColor Red
@@ -82,7 +90,11 @@ $services = @(
 
 foreach ($service in $services) {
     Write-Host "Starting $($service.Name)..."
-    $proc = Start-Process "dotnet" -ArgumentList "run --launch-profile `"https`" --project ../scr/$($service.Name)" -PassThru -NoNewWindow
+	Start-Process "dotnet" `
+    -WorkingDirectory $RepoRoot `
+    -ArgumentList "run --launch-profile `"https`" --project scr/$($service.Name)"`
+    -PassThru `
+    -NoNewWindow
 
     # waiting port opening
     $maxAttempts = 20
