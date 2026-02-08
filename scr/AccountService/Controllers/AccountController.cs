@@ -64,13 +64,12 @@ namespace AccountService.Controllers
 
         [Authorize(Policy = "RequireUserId")]
         [HttpGet("accounts/{id}")]
-        public async Task<IActionResult> GetAccount(string id) 
+        public async Task<IActionResult> GetAccount(Guid? accountId) 
         {
             var userId = User.FindFirst("user_id")?.Value;
             var userRole = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
-            var isValidGuid = Guid.TryParse(id, out var accountId);
 
-            if (!isValidGuid)
+            if (accountId == null)
             {
                 return Problem(
                     detail: $"Id {accountId} is not valid",
@@ -123,18 +122,37 @@ namespace AccountService.Controllers
 
         [Authorize(Policy = "RequireUserId")]
         [HttpGet("accounts")]
-        public async Task<IActionResult> GetAllAccounts(bool getAllAccounts = false)
+        public async Task<IActionResult> GetAllAccounts(bool everyoneAccounts = false)
         {
-            var accounts = await _dbContext.Accounts.ToListAsync();
+            var userRole = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
 
-            if (getAllAccounts)
-                return Ok(accounts);
+            if (userRole == null)
+            {
+                return Problem(
+                    detail: "Cannot find user role in the database. contact the administrator",
+                    statusCode: 401,
+                    title: "Unauthorized",
+                    type: "https://httpstatuses.com/401"
+                );
+            }
+
+            var accounts = new List<Account>();
+            var result = new List<AccountsDto>();
+
+            if(everyoneAccounts && (userRole?.ToLower().Contains("admin") ?? false) )
+            {
+                accounts = await _dbContext.Accounts.ToListAsync();
+                _mapper.Map(accounts, result);
+
+                return Ok(result);
+            }
 
             var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
 
-            accounts = accounts.Where(a => a.UserId == userId).ToList();
+            accounts = await _dbContext.Accounts.Where(a => a.UserId == userId).ToListAsync();
+            _mapper.Map(accounts, result);
 
-            return Ok(accounts);
+            return Ok(result);
         }
     }
 }
