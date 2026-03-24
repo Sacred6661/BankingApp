@@ -29,7 +29,9 @@ namespace AccountService.Consumers
                 RelatedAccountNumber = msg.RelatedAccountNumber,
                 TransactionStatus = msg.TransactionStatus,
                 PerformedByService = "AccountService",
-                TransactionId = msg.TransactionId
+                TransactionId = msg.TransactionId,
+                AccountBalance = "0",
+                RelatedAccountBalance = "0"  
             };
 
             var isGuid = Guid.TryParse(msg.AccountNumber, out var accountNumber);
@@ -160,6 +162,8 @@ namespace AccountService.Consumers
                     transactionResult.AccountNumber = msg.AccountNumber;
                     transactionResult.RelatedAccountNumber = msg.RelatedAccountNumber;
                     transactionResult.Details = $"Transfer from accoutn {msg.AccountNumber} to account {msg.RelatedAccountNumber}";
+                    transactionResult.AccountBalance = account.Balance.ToString();
+                    transactionResult.RelatedAccountBalance = relatedAccount?.Balance.ToString();
                 }
 
                 await _dbContext.SaveChangesAsync();

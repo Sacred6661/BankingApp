@@ -116,7 +116,7 @@ namespace AccountService.Tests
             var controller = CreateController(db, mapperMock, user);
 
             // act
-            var result = await controller.GetAccount("not-a-guid") as ObjectResult;
+            var result = await controller.GetAccount(null) as ObjectResult;
 
             // assert
             Assert.NotNull(result);
@@ -132,7 +132,7 @@ namespace AccountService.Tests
             var user = CreateUser(Guid.NewGuid().ToString(), role: null);
             var controller = CreateController(db, mapperMock, user);
 
-            var id = Guid.NewGuid().ToString();
+            var id = Guid.NewGuid();
 
             // act
             var result = await controller.GetAccount(id) as ObjectResult;
@@ -151,7 +151,7 @@ namespace AccountService.Tests
             var user = CreateUser(Guid.NewGuid().ToString(), "Admin");
             var controller = CreateController(db, mapperMock, user);
 
-            var id = Guid.NewGuid().ToString();
+            var id = Guid.NewGuid();
 
             // act
             var result = await controller.GetAccount(id) as ObjectResult;
@@ -177,7 +177,7 @@ namespace AccountService.Tests
             var controller = CreateController(db, mapperMock, user);
 
             // act
-            var result = await controller.GetAccount(account.Id.ToString()) as ObjectResult;
+            var result = await controller.GetAccount(account.Id) as ObjectResult;
 
             // assert
             Assert.NotNull(result);
@@ -207,7 +207,7 @@ namespace AccountService.Tests
             var controller = CreateController(db, mapperMock, user);
 
             // act
-            var result = await controller.GetAccount(account.Id.ToString()) as OkObjectResult;
+            var result = await controller.GetAccount(account.Id) as OkObjectResult;
 
             // assert
             Assert.NotNull(result);
@@ -232,7 +232,7 @@ namespace AccountService.Tests
             var controller = CreateController(db, mapperMock, user);
 
             // act
-            var result = await controller.GetAllAccounts(getAllAccounts: true) as OkObjectResult;
+            var result = await controller.GetAllAccounts(everyoneAccounts: true) as OkObjectResult;
 
             // assert
             Assert.NotNull(result);

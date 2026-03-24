@@ -4,9 +4,17 @@ import { fetchMe } from "../features/auth/authSlice";
 import type { AppDispatch, RootState } from "../app/store";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 
+import {
+  startConnection,
+  stopConnection,
+} from "../services/signalr/connection";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading } = useSelector((state: RootState) => state.auth);
+  const { loading, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth,
+  );
+
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -26,6 +34,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
     };
   }, [dispatch]);
+
+  // 🔥 SignalR lifecycle
+  useEffect(() => {
+    console.log("SignalR useEffect");
+    if (!isAuthenticated) return;
+
+    startConnection().catch((err) => {
+      console.error("SignalR connection failed:", err);
+    });
+
+    return () => {
+      stopConnection();
+    };
+  }, [isAuthenticated]);
 
   if (!initialized) {
     return (

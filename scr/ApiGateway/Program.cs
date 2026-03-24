@@ -1,6 +1,7 @@
 using AccountService.Helpers;
 using ApiGateway.Middlewares;
 using Common.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 

@@ -13,4 +13,6 @@ message AccountActionDone {
 	string transaction_id = 8;
 	string performed_by_service = 9;
 	bool is_error = 10;
+	string account_balance = 11;
+	string related_account_balance = 12;
 }

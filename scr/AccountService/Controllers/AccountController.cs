@@ -154,5 +154,32 @@ namespace AccountService.Controllers
 
             return Ok(result);
         }
+
+        [Authorize(Policy = "RequireUserId")]
+        [HttpGet("accounts/check/{id}")]
+        public async Task<IActionResult> CheckAccountExist(Guid id)
+        {
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+
+            if (account == null)
+            {
+                var problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Account not found",
+                    Detail = $"Cannot find account with id {id}",
+                    Type = "https://api.myapp.com/problems/account-not-found"
+                };
+
+                problem.Extensions["code"] = "ACCOUNT_NOT_FOUND";
+
+                return StatusCode(problem.Status.Value, problem);
+            }
+
+            var result = new AccountsDto();
+            _mapper.Map(account, result);
+
+            return Ok(result);
+        }
     }
 }

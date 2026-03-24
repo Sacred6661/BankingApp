@@ -2,6 +2,7 @@ using AutoMapper;
 using Common.Logging;
 using MassTransit;
 using Messaging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,7 +10,9 @@ using TransactionService.Authorization;
 using TransactionService.Consumers;
 using TransactionService.Data;
 using TransactionService.Helpers;
+using TransactionService.Hubs;
 using TransactionService.Mapping;
+using TransactionService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +57,9 @@ var mapperConfig = new MapperConfiguration(cfg =>
 
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
+
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<ISignalRNotifier, SignalRNotifier>();
 
 builder.Services.AddControllers();
 
@@ -107,6 +113,9 @@ LoggingSetup.UseCorrelationLogging(app);
 
 await InitializeDatabase.DropDatabasesAsync(app.Services);
 await InitializeDatabase.InitDbAsync(app.Services);
+
+app.UseWebSockets();
+app.MapHub<TransactionHub>("/hubs/transaction");
 
 // Configure the HTTP request pipeline.
 

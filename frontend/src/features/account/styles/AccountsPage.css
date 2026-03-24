@@ -1,0 +1,80 @@
+.accounts-page {
+  padding: 32px;
+}
+
+/* ===== Add card ===== */
+
+.add-card-button {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 40px;
+  display: block;
+
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  background: #111827;
+  color: white;
+}
+
+/* ===== Slider layout ===== */
+
+.slider-layout {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+/* стрілки ЗОВНІ, не поверх */
+.nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+
+  background: #111827;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Swiper займає ВСЮ доступну ширину між кнопками */
+.accounts-swiper {
+  flex: 1;
+}
+
+/* ===== Card ===== */
+
+.account-card {
+  height: 180px;
+  border-radius: 20px;
+  padding: 16px;
+
+  background: linear-gradient(135deg, #1f2937, #111827);
+  color: white;
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.account-card-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  letter-spacing: 1px;
+  opacity: 0.85;
+  text-align: center;
+  word-break: break-all;
+}
+
+.error {
+  color: #ef4444;
+}

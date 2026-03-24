@@ -3,10 +3,13 @@ using Messaging;
 using System.Transactions;
 using TransactionService.Data;
 using TransactionService.Data.Models;
+using TransactionService.DTOs;
+using TransactionService.Services;
 
 namespace TransactionService.Consumers
 {
-    public class AccountActionDoneConsumer(TransactionsDbContext dbContext, ISendEndpointProvider sendProvider) : IConsumer<AccountActionDone>
+    public class AccountActionDoneConsumer(TransactionsDbContext dbContext, ISendEndpointProvider sendProvider,
+        ISignalRNotifier notifier) : IConsumer<AccountActionDone>
     {
         private readonly TransactionsDbContext _dbContext = dbContext;
         private readonly ISendEndpointProvider _sendProvider = sendProvider;
@@ -33,8 +36,23 @@ namespace TransactionService.Consumers
                 TransactionType = msg.TransactionType
             };
 
+            var transactionUpdateData = new TransactionUpdateDto
+            {
+                TransactionId = transactionId,
+                FromAccountNumber = msg.AccountNumber,
+                FromAccountBalance = decimal.Parse(msg.AccountBalance),
+                ToAccountNumber = msg.RelatedAccountNumber,
+                ToAccountBalance = decimal.Parse(msg.RelatedAccountBalance),
+                Amount = decimal.Parse(msg.Amount),
+                TransactionType = (TransactionTypeEnum)msg.TransactionType,
+                TransactionStatus = (TransactionStatusEnum)msg.TransactionStatus,
+                Details = msg.Details
+            };
 
-            if(transaction != null && msg.TransactionStatus == (int)TransactionStatusEnum.Accepted)
+            await notifier.NotifyTransactionUpdate(transactionId, transactionUpdateData);
+
+
+            if (transaction != null && msg.TransactionStatus == (int)TransactionStatusEnum.Accepted)
             {
                 transaction.TransactionStatusEnum = TransactionStatusEnum.Accepted;
                 await _dbContext.SaveChangesAsync();

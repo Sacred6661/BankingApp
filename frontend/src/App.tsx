@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
+import AccountsPage from "./pages/AccountsPage";
 import { Container } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 
@@ -25,6 +26,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/accounts" element={<AccountsPage />} />
           </Route>
         </Routes>
       </AuthProvider>
