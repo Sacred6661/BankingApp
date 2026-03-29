@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import {
-  subscribeToTransaction,
   onTransactionUpdated,
   offTransactionUpdated,
 } from "../../../services/signalr/transactionHub";
@@ -30,9 +29,6 @@ export const useTransactionUpdates = (
     if (!transactionId) return;
 
     const setup = async () => {
-      //await startConnection();
-      await subscribeToTransaction(transactionId);
-
       onTransactionUpdated(onUpdate);
     };
 

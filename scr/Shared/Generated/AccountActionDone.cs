@@ -24,19 +24,19 @@ namespace Messaging {
     static AccountActionDoneReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChlhY2NvdW50LWFjdGlvbi1kb25lLnByb3RvEgltZXNzYWdpbmciugIKEUFj",
+            "ChlhY2NvdW50LWFjdGlvbi1kb25lLnByb3RvEgltZXNzYWdpbmciywIKEUFj",
             "Y291bnRBY3Rpb25Eb25lEhYKDmFjY291bnRfbnVtYmVyGAEgASgJEh4KFnJl",
             "bGF0ZWRfYWNjb3VudF9udW1iZXIYAiABKAkSDgoGYW1vdW50GAMgASgJEhgK",
             "EHRyYW5zYWN0aW9uX3R5cGUYBCABKAUSFAoMcGVyZm9ybWVkX2J5GAUgASgJ",
             "Eg8KB2RldGFpbHMYBiABKAkSGgoSdHJhbnNhY3Rpb25fc3RhdHVzGAcgASgF",
             "EhYKDnRyYW5zYWN0aW9uX2lkGAggASgJEhwKFHBlcmZvcm1lZF9ieV9zZXJ2",
             "aWNlGAkgASgJEhAKCGlzX2Vycm9yGAogASgIEhcKD2FjY291bnRfYmFsYW5j",
-            "ZRgLIAEoCRIfChdyZWxhdGVkX2FjY291bnRfYmFsYW5jZRgMIAEoCWIGcHJv",
-            "dG8z"));
+            "ZRgLIAEoCRIfChdyZWxhdGVkX2FjY291bnRfYmFsYW5jZRgMIAEoCRIPCgd1",
+            "c2VyX2lkGA0gASgJYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Messaging.AccountActionDone), global::Messaging.AccountActionDone.Parser, new[]{ "AccountNumber", "RelatedAccountNumber", "Amount", "TransactionType", "PerformedBy", "Details", "TransactionStatus", "TransactionId", "PerformedByService", "IsError", "AccountBalance", "RelatedAccountBalance" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Messaging.AccountActionDone), global::Messaging.AccountActionDone.Parser, new[]{ "AccountNumber", "RelatedAccountNumber", "Amount", "TransactionType", "PerformedBy", "Details", "TransactionStatus", "TransactionId", "PerformedByService", "IsError", "AccountBalance", "RelatedAccountBalance", "UserId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -90,6 +90,7 @@ namespace Messaging {
       isError_ = other.isError_;
       accountBalance_ = other.accountBalance_;
       relatedAccountBalance_ = other.relatedAccountBalance_;
+      userId_ = other.userId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -243,6 +244,18 @@ namespace Messaging {
       }
     }
 
+    /// <summary>Field number for the "user_id" field.</summary>
+    public const int UserIdFieldNumber = 13;
+    private string userId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string UserId {
+      get { return userId_; }
+      set {
+        userId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -270,6 +283,7 @@ namespace Messaging {
       if (IsError != other.IsError) return false;
       if (AccountBalance != other.AccountBalance) return false;
       if (RelatedAccountBalance != other.RelatedAccountBalance) return false;
+      if (UserId != other.UserId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -289,6 +303,7 @@ namespace Messaging {
       if (IsError != false) hash ^= IsError.GetHashCode();
       if (AccountBalance.Length != 0) hash ^= AccountBalance.GetHashCode();
       if (RelatedAccountBalance.Length != 0) hash ^= RelatedAccountBalance.GetHashCode();
+      if (UserId.Length != 0) hash ^= UserId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -355,6 +370,10 @@ namespace Messaging {
         output.WriteRawTag(98);
         output.WriteString(RelatedAccountBalance);
       }
+      if (UserId.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(UserId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -413,6 +432,10 @@ namespace Messaging {
         output.WriteRawTag(98);
         output.WriteString(RelatedAccountBalance);
       }
+      if (UserId.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(UserId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -458,6 +481,9 @@ namespace Messaging {
       }
       if (RelatedAccountBalance.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(RelatedAccountBalance);
+      }
+      if (UserId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(UserId);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -506,6 +532,9 @@ namespace Messaging {
       }
       if (other.RelatedAccountBalance.Length != 0) {
         RelatedAccountBalance = other.RelatedAccountBalance;
+      }
+      if (other.UserId.Length != 0) {
+        UserId = other.UserId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -574,6 +603,10 @@ namespace Messaging {
             RelatedAccountBalance = input.ReadString();
             break;
           }
+          case 106: {
+            UserId = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -639,6 +672,10 @@ namespace Messaging {
           }
           case 98: {
             RelatedAccountBalance = input.ReadString();
+            break;
+          }
+          case 106: {
+            UserId = input.ReadString();
             break;
           }
         }

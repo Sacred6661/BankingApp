@@ -1,5 +1,6 @@
 using AccountService.Helpers;
 using ApiGateway.Middlewares;
+using ApiGateway.Models;
 using Common.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -15,6 +16,9 @@ var jwksUrl = jwtConfig["JwksUrl"];
 var keys = await JwtHelper.FetchSigningKeysFromJwks(jwksUrl);
 
 var frontendUrl = builder.Configuration["FrontendUrl"];
+
+builder.Services.Configure<TokenRefreshOptions>(
+    builder.Configuration.GetSection("TokenRefresh"));
 
 builder.Services.AddCors(options =>
 {
@@ -46,6 +50,8 @@ builder.Services.AddAuthentication("Bearer")
         options.TokenValidationParameters.RoleClaimType = "role";
     });
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
@@ -56,6 +62,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
     });
 });
+
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

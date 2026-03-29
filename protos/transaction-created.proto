@@ -12,4 +12,5 @@ message TransactionCreated {
 	int32 transaction_status = 7;
 	string transaction_id = 8;
 	string performed_by_service = 9;
+	string user_id = 10;
 }

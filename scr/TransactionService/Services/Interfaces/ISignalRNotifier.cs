@@ -2,6 +2,6 @@
 {
     public interface ISignalRNotifier
     {
-        Task NotifyTransactionUpdate(Guid transactionId, object data);
+        Task NotifyTransactionUpdate(string userId, object data);
     }
 }

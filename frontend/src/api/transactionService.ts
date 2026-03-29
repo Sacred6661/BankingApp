@@ -16,9 +16,19 @@ export interface TransferRequest {
   amount: number;
 }
 
+export interface DepositRequest {
+  accountNumber: string;
+  amount: number;
+}
+
+export interface WithdrawRequest {
+  accountNumber: string;
+  amount: number;
+}
+
 export enum TransactionTypeEnum {
   Deposit = 1,
-  Withdrawal = 2,
+  Withdraw = 2,
   Transfer = 3,
 }
 

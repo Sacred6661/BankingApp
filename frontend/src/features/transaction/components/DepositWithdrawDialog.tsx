@@ -1,19 +1,21 @@
 import { Dialog, DialogTitle } from "@mui/material";
 import { useState } from "react";
 import type { AccountDto } from "../../../api/accountService";
-import { TransferForm } from "./TransferForm";
-import TransferProcessing from "./TransferProcessing";
-import { TransferResult } from "./TransferResult";
 import { useTransactionUpdates } from "../hooks/useTransactionUpdates";
 import { TransactionStatusEnum } from "../../../api/transactionService";
 import { useAccounts } from "../../../hooks/useAccounts";
+import { DepositWithdrawForm } from "./DepositWithdrawForm";
+import { TransactionTypeEnum } from "../../../api/transactionService";
+import TransferProcessing from "./TransferProcessing";
+import { TransferResult } from "./TransferResult";
 import toast from "react-hot-toast";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   accounts: AccountDto[];
-  fromAccountId: string; // активна картка зі слайдера
+  fromAccountId: string;
+  transactionType: TransactionTypeEnum;
 }
 
 enum StepsEnum {
@@ -22,11 +24,12 @@ enum StepsEnum {
   Result = 3,
 }
 
-export const TransferDialog = ({
+export const DepositWithdrawDialog = ({
   open,
   onClose,
   accounts,
   fromAccountId,
+  transactionType,
 }: Props) => {
   const { updateAccountBalance } = useAccounts();
 
@@ -40,7 +43,6 @@ export const TransferDialog = ({
       setResult(TransactionStatusEnum.Accepted);
 
       updateAccountBalance(data.fromAccountNumber, data.fromAccountBalance);
-      updateAccountBalance(data.toAccountNumber, data.toAccountBalance);
 
       toast.success("The operation was successful!");
       setStep(StepsEnum.Result);
@@ -65,14 +67,18 @@ export const TransferDialog = ({
     onClose();
   };
 
+  const dialogTitle =
+    transactionType === TransactionTypeEnum.Deposit ? "Deposit" : "Withdraw";
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Transfer</DialogTitle>
+      <DialogTitle>{dialogTitle}</DialogTitle>
 
       {step === StepsEnum.Form && (
-        <TransferForm
+        <DepositWithdrawForm
           onClose={handleClose}
           accounts={accounts}
+          transactionType={transactionType}
           fromAccountId={fromAccountId}
           onTransactionCreated={handleTransactionCreated}
         />

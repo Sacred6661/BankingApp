@@ -49,7 +49,7 @@ namespace TransactionService.Consumers
                 Details = msg.Details
             };
 
-            await notifier.NotifyTransactionUpdate(transactionId, transactionUpdateData);
+            await notifier.NotifyTransactionUpdate(msg?.UserId, transactionUpdateData);
 
 
             if (transaction != null && msg.TransactionStatus == (int)TransactionStatusEnum.Accepted)

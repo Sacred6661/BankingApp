@@ -31,7 +31,8 @@ namespace AccountService.Consumers
                 PerformedByService = "AccountService",
                 TransactionId = msg.TransactionId,
                 AccountBalance = "0",
-                RelatedAccountBalance = "0"  
+                RelatedAccountBalance = "0",
+                UserId = msg?.UserId
             };
 
             var isGuid = Guid.TryParse(msg.AccountNumber, out var accountNumber);
@@ -90,6 +91,8 @@ namespace AccountService.Consumers
 
                         transactionResult.TransactionStatus = (int)TransactionStatusEnum.Accepted;
                         transactionResult.Details = $"Deposit to the account {accountNumber}";
+                        transactionResult.AccountBalance = account.Balance.ToString();
+
                         await sendEndpointHistory.Send(transactionResult);
                         break;
                     case (int)TransactionTypeEnum.Withdraw:
@@ -108,6 +111,7 @@ namespace AccountService.Consumers
 
                         transactionResult.TransactionStatus = (int)TransactionStatusEnum.Accepted;
                         transactionResult.Details = $"Withdraw from the account {accountNumber}";
+                        transactionResult.AccountBalance = account.Balance.ToString();
 
                         await sendEndpointHistory.Send(transactionResult);
                         break;

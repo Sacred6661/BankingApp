@@ -24,17 +24,17 @@ namespace Messaging {
     static TransactionCreatedReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Chl0cmFuc2FjdGlvbi1jcmVhdGVkLnByb3RvEgltZXNzYWdpbmci7wEKElRy",
+            "Chl0cmFuc2FjdGlvbi1jcmVhdGVkLnByb3RvEgltZXNzYWdpbmcigAIKElRy",
             "YW5zYWN0aW9uQ3JlYXRlZBIWCg5hY2NvdW50X251bWJlchgBIAEoCRIeChZy",
             "ZWxhdGVkX2FjY291bnRfbnVtYmVyGAIgASgJEg4KBmFtb3VudBgDIAEoCRIY",
             "ChB0cmFuc2FjdGlvbl90eXBlGAQgASgFEhQKDHBlcmZvcm1lZF9ieRgFIAEo",
             "CRIPCgdkZXRhaWxzGAYgASgJEhoKEnRyYW5zYWN0aW9uX3N0YXR1cxgHIAEo",
             "BRIWCg50cmFuc2FjdGlvbl9pZBgIIAEoCRIcChRwZXJmb3JtZWRfYnlfc2Vy",
-            "dmljZRgJIAEoCWIGcHJvdG8z"));
+            "dmljZRgJIAEoCRIPCgd1c2VyX2lkGAogASgJYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Messaging.TransactionCreated), global::Messaging.TransactionCreated.Parser, new[]{ "AccountNumber", "RelatedAccountNumber", "Amount", "TransactionType", "PerformedBy", "Details", "TransactionStatus", "TransactionId", "PerformedByService" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Messaging.TransactionCreated), global::Messaging.TransactionCreated.Parser, new[]{ "AccountNumber", "RelatedAccountNumber", "Amount", "TransactionType", "PerformedBy", "Details", "TransactionStatus", "TransactionId", "PerformedByService", "UserId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -85,6 +85,7 @@ namespace Messaging {
       transactionStatus_ = other.transactionStatus_;
       transactionId_ = other.transactionId_;
       performedByService_ = other.performedByService_;
+      userId_ = other.userId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -202,6 +203,18 @@ namespace Messaging {
       }
     }
 
+    /// <summary>Field number for the "user_id" field.</summary>
+    public const int UserIdFieldNumber = 10;
+    private string userId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string UserId {
+      get { return userId_; }
+      set {
+        userId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -226,6 +239,7 @@ namespace Messaging {
       if (TransactionStatus != other.TransactionStatus) return false;
       if (TransactionId != other.TransactionId) return false;
       if (PerformedByService != other.PerformedByService) return false;
+      if (UserId != other.UserId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -242,6 +256,7 @@ namespace Messaging {
       if (TransactionStatus != 0) hash ^= TransactionStatus.GetHashCode();
       if (TransactionId.Length != 0) hash ^= TransactionId.GetHashCode();
       if (PerformedByService.Length != 0) hash ^= PerformedByService.GetHashCode();
+      if (UserId.Length != 0) hash ^= UserId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -296,6 +311,10 @@ namespace Messaging {
         output.WriteRawTag(74);
         output.WriteString(PerformedByService);
       }
+      if (UserId.Length != 0) {
+        output.WriteRawTag(82);
+        output.WriteString(UserId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -342,6 +361,10 @@ namespace Messaging {
         output.WriteRawTag(74);
         output.WriteString(PerformedByService);
       }
+      if (UserId.Length != 0) {
+        output.WriteRawTag(82);
+        output.WriteString(UserId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -378,6 +401,9 @@ namespace Messaging {
       }
       if (PerformedByService.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(PerformedByService);
+      }
+      if (UserId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(UserId);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -417,6 +443,9 @@ namespace Messaging {
       }
       if (other.PerformedByService.Length != 0) {
         PerformedByService = other.PerformedByService;
+      }
+      if (other.UserId.Length != 0) {
+        UserId = other.UserId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -473,6 +502,10 @@ namespace Messaging {
             PerformedByService = input.ReadString();
             break;
           }
+          case 82: {
+            UserId = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -526,6 +559,10 @@ namespace Messaging {
           }
           case 74: {
             PerformedByService = input.ReadString();
+            break;
+          }
+          case 82: {
+            UserId = input.ReadString();
             break;
           }
         }

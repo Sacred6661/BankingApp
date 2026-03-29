@@ -8,7 +8,9 @@ import { useAccounts } from "../hooks/useAccounts";
 import { ConfirmCreateAccountDialog } from "../features/account/components/ConfirmCreateAccountDialog";
 import { AccountCard } from "../features/account/components/AccountCard";
 import { TransferDialog } from "../features/transaction/components/TransferDialog";
+import { DepositWithdrawDialog } from "../features/transaction/components/DepositWithdrawDialog";
 import { NoExistingAccounts } from "../features/account/components/NoExistingAccounts";
+import { TransactionTypeEnum } from "../api/transactionService";
 
 export default function AccountsPage() {
   const { accountsList, loading, error, createAccount, fetchAccounts } =
@@ -17,6 +19,10 @@ export default function AccountsPage() {
   const swiperRef = useRef<any>(null);
   const [createAccountOpen, setCreateAccountOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
+  const [depositWithdrawOpen, setDepositWithdrawOpen] = useState(false);
+  const [transactionType, setTransactionType] = useState<TransactionTypeEnum>(
+    TransactionTypeEnum.Deposit,
+  );
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,6 +33,11 @@ export default function AccountsPage() {
   const handleCreateAccount = async () => {
     createAccount();
     setCreateAccountOpen(false);
+  };
+
+  const handleDepositWithdrawClick = (transactionType: TransactionTypeEnum) => {
+    setTransactionType(transactionType);
+    setDepositWithdrawOpen(true);
   };
 
   return (
@@ -129,12 +140,52 @@ export default function AccountsPage() {
         Transfer
       </Button>
 
+      <Button
+        variant="contained"
+        size="large"
+        sx={{
+          mt: 4,
+          mb: 4,
+          ml: 4,
+          maxWidth: 300,
+          background: "linear-gradient(135deg, #0f172a, #020617)",
+        }}
+        onClick={() => handleDepositWithdrawClick(TransactionTypeEnum.Deposit)}
+      >
+        Deposit
+      </Button>
+
+      <Button
+        variant="contained"
+        size="large"
+        sx={{
+          mt: 4,
+          mb: 4,
+          ml: 4,
+          maxWidth: 300,
+          background: "linear-gradient(135deg, #0f172a, #020617)",
+        }}
+        onClick={() => handleDepositWithdrawClick(TransactionTypeEnum.Withdraw)}
+      >
+        Withdraw
+      </Button>
+
       {activeAccountId && (
         <TransferDialog
           open={transferOpen}
           onClose={() => setTransferOpen(false)}
           accounts={accountsList}
           fromAccountId={activeAccountId}
+        />
+      )}
+
+      {activeAccountId && (
+        <DepositWithdrawDialog
+          open={depositWithdrawOpen}
+          onClose={() => setDepositWithdrawOpen(false)}
+          accounts={accountsList}
+          fromAccountId={activeAccountId}
+          transactionType={transactionType}
         />
       )}
     </Box>

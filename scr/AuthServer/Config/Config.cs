@@ -68,6 +68,8 @@ namespace AuthServer.Config
 
                 AllowOfflineAccess = true,
 
+                AccessTokenLifetime = int.Parse(GetSecret("IdentitySecrets:AccessTokenLifetimeInSeconds")),
+
                 RefreshTokenUsage = TokenUsage.OneTimeOnly,
                 RefreshTokenExpiration = TokenExpiration.Sliding,
                 SlidingRefreshTokenLifetime = 1296000, 

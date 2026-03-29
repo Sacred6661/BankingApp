@@ -5,6 +5,7 @@ using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using MassTransit;
 using Messaging;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -142,6 +143,13 @@ namespace AuthServer.Controllers
                 return StatusCode((int)response.StatusCode, responseString);
 
             return Content(responseString, "application/json");
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return Ok();
         }
 
         [HttpGet("me")]

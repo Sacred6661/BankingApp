@@ -57,7 +57,8 @@ namespace TransactionService.Controllers
                 TransactionId = transaction.TransactionId.ToString(),
                 TransactionStatus = transaction.TransactionStatusId,
                 Details = "Transaction created",
-                PerformedByService = "TransactionService"
+                PerformedByService = "TransactionService",
+                UserId = userId
             };
 
             await _publish.Publish(transactionCreated);
@@ -101,7 +102,8 @@ namespace TransactionService.Controllers
                 TransactionId = transaction.TransactionId.ToString(),
                 TransactionStatus = transaction.TransactionStatusId,
                 Details = "Transaction created",
-                PerformedByService = "TransactionService"
+                PerformedByService = "TransactionService",
+                UserId = userId
             };
 
             await _publish.Publish(transactionCreated);
@@ -151,7 +153,8 @@ namespace TransactionService.Controllers
                 TransactionId = transaction.TransactionId.ToString(),
                 TransactionStatus = transaction.TransactionStatusId,
                 Details = "Transaction created",
-                PerformedByService = "TransactionService"
+                PerformedByService = "TransactionService",
+                UserId = userId
             };
 
             await _publish.Publish(transactionCreated);
