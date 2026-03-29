@@ -12,7 +12,7 @@ let isRedirecting = false;
 
 axiosClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     if (error.response?.status === 401 && !isRedirecting) {
       isRedirecting = true;
 
