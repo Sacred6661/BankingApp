@@ -31,7 +31,7 @@ namespace AccountService.Controllers
             if (userRole?.ToLower()?.Contains("Admin".ToLower()) ?? false)
             {
                 if (request.UserId != null)
-                    userId = request.UserId.ToString();
+                    userId = request.UserId.ToString(); 
 
                 initialBalance = request.InitialBalance;
             }

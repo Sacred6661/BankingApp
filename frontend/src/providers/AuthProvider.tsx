@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMe } from "../features/auth/authSlice";
 import type { AppDispatch, RootState } from "../app/store";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-
 import {
   startConnection,
   stopConnection,
@@ -11,34 +10,43 @@ import {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const [initialized, setInitialized] = useState(false);
+  const fetchingRef = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    // Reset the redirect status after a successful login
+    if (fetchingRef.current) return;
 
-    (async () => {
+    fetchingRef.current = true;
+
+    const init = async () => {
       try {
+        console.log("start provider fetch");
         await dispatch(fetchMe());
+        console.log("end provider fetch");
       } catch (err) {
-        // 401 and other errors ignore
+        console.error("fetchMe error:", err);
       } finally {
-        if (!cancelled) setInitialized(true); // to set only once
+        setInitialized(true);
       }
-    })();
+    };
 
+    init();
+
+    // Cleanup for StrictMode
     return () => {
-      cancelled = true;
+      // We don't discard fetchingRef because it's a global variable
     };
   }, [dispatch]);
 
-  // 🔥 SignalR lifecycle
+  // SignalR lifecycle
   useEffect(() => {
-    console.log("SignalR useEffect");
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      stopConnection();
+      return;
+    }
 
     startConnection().catch((err) => {
       console.error("SignalR connection failed:", err);
@@ -50,12 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated]);
 
   if (!initialized) {
-    return (
-      <>
-        <LoadingOverlay loading={!initialized || loading} />
-        {initialized && children}
-      </>
-    );
+    return <LoadingOverlay loading={true} />;
   }
 
   return <>{children}</>;

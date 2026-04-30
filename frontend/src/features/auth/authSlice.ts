@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authService } from "../../api/authService";
+import { resetRedirectState } from "../../api/axiosClient"; // import
 import type {
   LoginRequest,
   LoginResponse,
@@ -30,7 +31,9 @@ export const login = createAsyncThunk<LoginResponse, LoginRequest>(
   "auth/login",
   async (credentials, thunkAPI) => {
     try {
-      return await authService.login(credentials);
+      const response = await authService.login(credentials);
+      resetRedirectState(); // Reset the redirect status after a successful login
+      return response;
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Login failed");
     }
@@ -54,7 +57,9 @@ export const fetchMe = createAsyncThunk<MeResponse>(
   "auth/me",
   async (_, thunkAPI) => {
     try {
-      return await authService.me();
+      const response = await authService.me();
+      resetRedirectState(); // reset state, we authorized ok
+      return response;
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Unauthorized");
     }
@@ -118,11 +123,14 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
+        console.log("fetchMe fulfilled", state, action);
+        console.trace("fetchMe called from here");
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(fetchMe.rejected, (state) => {
+        console.log("fetchMe reject", state);
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;

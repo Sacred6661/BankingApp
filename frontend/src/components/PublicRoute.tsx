@@ -1,13 +1,5 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import LoadingOverlay from "./ui/LoadingOverlay";
+import { Outlet } from "react-router-dom";
 
 export function PublicRoute() {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingOverlay loading={true} />;
-  }
-
-  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+  return <Outlet />;
 }

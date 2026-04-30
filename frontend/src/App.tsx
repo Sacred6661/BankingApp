@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
-import { PublicRoute } from "./components/PublicRoute";
+import { UnauthenticatedRoute } from "./components/UnauthenticatedRoute";
 import { AuthProvider } from "./providers/AuthProvider";
 
 import HomePage from "./pages/HomePage";
@@ -17,7 +17,7 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public */}
-          <Route element={<PublicRoute />}>
+          <Route element={<UnauthenticatedRoute />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Route>
