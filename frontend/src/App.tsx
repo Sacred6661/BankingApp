@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { UnauthenticatedRoute } from "./components/UnauthenticatedRoute";
 import { AuthProvider } from "./providers/AuthProvider";
+import { ProfileRedirect } from "./components/ProfileRedirect";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -15,6 +16,7 @@ function App() {
   return (
     <Container maxWidth="lg">
       <AuthProvider>
+        <ProfileRedirect />
         <Routes>
           {/* Public */}
           <Route element={<UnauthenticatedRoute />}>

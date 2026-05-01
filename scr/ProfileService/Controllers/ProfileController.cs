@@ -1,5 +1,6 @@
 ﻿using MapsterMapper;
 using MassTransit;
+using Messaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace ProfileService.Controllers
 {
     [Route("api/v1")]
     [ApiController]
-    public class ProfileController(ProfileDbContext dbContext, IMapper mapper, ILogger<ProfileController> logger) : ControllerBase
+    public class ProfileController(ProfileDbContext dbContext, IMapper mapper, ISendEndpointProvider sendProvider) : ControllerBase
     {
         [Authorize(Policy = "RequireUserId")]
         [HttpGet("profiles/{userId:guid}")]
@@ -82,8 +83,10 @@ namespace ProfileService.Controllers
             var userId = Guid.Parse(User.FindFirst("user_id")?.Value);
             var userRole = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
 
+            var sendProfileEndpoint = await sendProvider.GetSendEndpoint(new Uri("queue:auth-profile-completed"));
+
             // if user without Admin role tries to update another user account - error 
-            if(profile.UserId != userId && (!userRole?.ToLower().Contains("Admin".ToLower()) ?? false))
+            if (profile.UserId != userId && (!userRole?.ToLower().Contains("Admin".ToLower()) ?? false))
                  return Problem(
                     statusCode: StatusCodes.Status403Forbidden,
                     title: "Not allowed to update another user account",
@@ -106,7 +109,8 @@ namespace ProfileService.Controllers
                     AvatarUrl = profile.AvatarUrl,
                     Birthday = profile.Birthday,
                     Contacts = new List<ProfileContact>(),
-                    Settings = new ProfileSettings()
+                    Settings = new ProfileSettings(),
+                    FirstCompleteDone = true
                 };
 
                 newProfile.Contacts.Add(new ProfileContact
@@ -143,6 +147,19 @@ namespace ProfileService.Controllers
             userProfile.AvatarUrl = profile.AvatarUrl;
             userProfile.Birthday = profile.Birthday;
             userProfile.UpdatedAt = DateTime.UtcNow;
+
+            if (!userProfile.FirstCompleteDone)
+            {
+                var profileCompleted = new ProfileCompleted
+                {
+                    UserId = userId.ToString(),
+                    IsProfileCompleted = true
+                };
+
+                await sendProfileEndpoint.Send(profileCompleted);
+
+                userProfile.FirstCompleteDone = true;
+            }
 
             userProfile.Settings.TimeZoneId = profile.Settings.TimezoneId;
             userProfile.Settings.LanguageId = profile.Settings.LanguageId;

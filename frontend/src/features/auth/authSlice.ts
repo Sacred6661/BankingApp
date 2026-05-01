@@ -15,6 +15,7 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   user: MeResponse | null;
+  isProfileComplete: boolean;
 }
 
 const initialState: AuthState = {
@@ -24,6 +25,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   user: null,
+  isProfileComplete: false,
 };
 
 // login
@@ -59,6 +61,7 @@ export const fetchMe = createAsyncThunk<MeResponse>(
     try {
       const response = await authService.me();
       resetRedirectState(); // reset state, we authorized ok
+
       return response;
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data || "Unauthorized");
@@ -93,6 +96,7 @@ const authSlice = createSlice({
         state.token = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.isAuthenticated = true;
+        state.isProfileComplete = action.payload.is_profile_complete;
       })
       .addCase(login.rejected, (state, action: any) => {
         state.loading = false;
@@ -123,8 +127,6 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
-        console.log("fetchMe fulfilled", state, action);
-        console.trace("fetchMe called from here");
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload;

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package messaging;
+
+message ProfileCompleted {
+	bool is_profile_completed = 1;
+	string user_id = 2;
+}

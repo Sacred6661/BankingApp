@@ -14,5 +14,7 @@ namespace AuthServer.Models
         public string RefreshToken { get; set; }
         [JsonProperty("scope")]
         public string Scope { get; set; }
+        [JsonProperty("is_profile_complete")]
+        public bool IsProfileComplete { get; set; } = false;
     }
 }

@@ -72,6 +72,8 @@ builder.Services.AddMassTransit(x =>
             e.UseMessageRetry(r => r.Interval(3, 500));
         });
 
+        cfg.ConfigureEndpoints(ctx);
+
         cfg.Host(rabbitMqConfig["Host"], "/", h =>
         {
             h.Username(rabbitMqConfig["Login"]);

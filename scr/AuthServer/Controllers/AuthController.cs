@@ -91,6 +91,11 @@ namespace AuthServer.Controllers
 
             if (tokenData != null)
             {
+                var userId = GetUserIdFromToken(tokenData.AccessToken);
+                var user = await _userManager.FindByIdAsync(userId);
+
+                tokenData.IsProfileComplete = user.IsProfileComplete;
+
                 var isDev = env.IsDevelopment();
 
                 Response.Cookies.Append("access_token", tokenData.AccessToken, new CookieOptions
@@ -110,6 +115,10 @@ namespace AuthServer.Controllers
                     Expires = DateTimeOffset.UtcNow.AddDays(7),
                     Path = "/"
                 });
+
+                var json = JsonConvert.SerializeObject(tokenData, Formatting.Indented);
+
+                return Content(json, "application/json");
             }
 
             // Return JSON response message from Duendo
@@ -176,12 +185,38 @@ namespace AuthServer.Controllers
                 {
                     user.Id,
                     user.Email,
-                    user.UserName
+                    user.UserName,
+                    user.IsProfileComplete
                 });
             }
             catch
             {
                 return Unauthorized();
+            }
+        }
+
+
+
+        // Допоміжні методи
+        private string GetUserIdFromToken(string accessToken)
+        {
+            try
+            {
+                // Декодуємо JWT без валідації (тільки читаємо payload)
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
+
+                // Шукаємо subject claim (sub) - це зазвичай user_id
+                var userId = jsonToken?.Claims.FirstOrDefault(c =>
+                    c.Type == "user_id" ||
+                    c.Type == "sub"
+                )?.Value;
+
+                return userId;
+            }
+            catch
+            {
+                return null;
             }
         }
     }

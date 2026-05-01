@@ -2,4 +2,5 @@
 
 public class ApplicationUser : IdentityUser
 {
+    public bool IsProfileComplete { get; set; }
 }

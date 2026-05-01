@@ -14,12 +14,14 @@ export interface LoginResponse {
   expires_in: number;
   token_type: string;
   refresh_token: string;
+  is_profile_complete: boolean;
 }
 
 export interface MeResponse {
   id: string;
   email: string;
   roles: string[];
+  isProfileComplete: boolean;
 }
 
 export interface RegisterRequest {

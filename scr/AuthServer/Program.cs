@@ -10,6 +10,7 @@ using Duende.IdentityServer.Services;
 using AuthServer.Services;
 using Common.Logging;
 using MassTransit;
+using AuthServer.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,10 +68,18 @@ builder.Services.AddControllers();
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<ProfileCompletedConsumer>();
+
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auth", false));
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
+        cfg.ReceiveEndpoint("auth-profile-completed", e =>
+        {
+            e.ConfigureConsumer<ProfileCompletedConsumer>(ctx);
+            e.UseMessageRetry(r => r.Interval(3, 500));
+        });
+
         cfg.Host(rabbitMqConfig["Host"], "/", h =>
         {
             h.Username(rabbitMqConfig["Login"]);

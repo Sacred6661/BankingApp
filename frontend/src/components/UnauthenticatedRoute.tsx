@@ -3,11 +3,15 @@ import { useAuth } from "../hooks/useAuth";
 import LoadingOverlay from "./ui/LoadingOverlay";
 
 export function UnauthenticatedRoute() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, isProfileComplete } = useAuth();
 
   if (loading) {
     return <LoadingOverlay loading={true} />;
   }
 
-  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+  if (isAuthenticated) {
+    return <Navigate to={isProfileComplete ? "/" : "/profile"} replace />;
+  }
+
+  return <Outlet />;
 }

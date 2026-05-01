@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProfileService.Data.Models
 {
@@ -19,6 +20,9 @@ namespace ProfileService.Data.Models
         public string Email {  get; set; }
 
         public DateTime? Birthday { get; set; }
+
+        // to check if this profile info is complete after registration
+        public bool FirstCompleteDone { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

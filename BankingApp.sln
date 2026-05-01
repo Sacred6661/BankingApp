@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{DE9F9D25-DD07-4890-B7D6-9A9EA7D19669}"
 	ProjectSection(SolutionItems) = preProject
 		protos\account-action-done.proto = protos\account-action-done.proto
+		protos\profile-completed.proto = protos\profile-completed.proto
 		protos\transaction-completed.proto = protos\transaction-completed.proto
 		protos\transaction-created.proto = protos\transaction-created.proto
 		protos\user-created.proto = protos\user-created.proto
